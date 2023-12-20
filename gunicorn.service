@@ -1,0 +1,14 @@
+[Unit]
+Description=fastapi healthconnect
+After=network.target
+
+[Service]
+User=tebogoyungmercykay
+Group=tebogoyungmercykay
+WorkingDirectory=/home/tebogoyungmercykay/app/src/
+Environment="PATH=/home/tebogoyungmercykay/app/python-api/bin"
+EnvironmentFile=/home/tebogoyungmercykay/.env
+ExecStart=/home/tebogoyungmercykay/app/python-api/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
