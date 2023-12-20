@@ -1,4 +1,4 @@
-name: Build and Deploy Code
+name: Build and Deploy Code to Docker and Heroku
 
 on:
   push:
