@@ -91,6 +91,16 @@
     ```
 - ###### 2. Note: SECRET_KEY in this example is just a psudo key. You need to get a key for youself and you can get the SECRET_KEY from fastapi documantion
 
+- ###### 3. Installing Requirements:
+    ```markdown
+    - Using a Script to Skip Failed ones:
+        - Making the File Executable:
+            chmod +x requirements_script.sh
+        - Running the Script:
+            ./requirements_script.sh
+    - Default way to install:
+        pip install -r requirements.txt
+    ```
 ---
 
 ---
