@@ -11,7 +11,7 @@
 
 - ###### Activating the Python Virtual Environment:
     ```markdown
-    - source python-api/bin/activate
+    - source venv/bin/activate
     ```
 
 - ###### Deactivating the Python Virtual Environment:
