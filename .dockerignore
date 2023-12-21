@@ -1,5 +1,6 @@
 __pycache__
 venv/
+python-api/
 .env
 Dockerfile
 .dockerignore
