@@ -8,3 +8,5 @@ Dockerfile
 Procfile
 nginx
 gunicorn.service
+./resources/
+resources/
