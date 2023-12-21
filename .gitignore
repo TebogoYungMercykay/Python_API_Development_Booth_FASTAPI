@@ -121,11 +121,14 @@ celerybeat.pid
 
 # Environments
 .env
-.python-api
+.venv
 env/
-python-api/
+venv/
 ENV/
 env.bak/
+venv.bak/
+.python-api
+python-api/
 python-api.bak/
 
 # Spyder project settings

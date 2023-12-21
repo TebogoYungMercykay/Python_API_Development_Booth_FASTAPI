@@ -54,6 +54,12 @@
     ```markdown
     This route is about likes or vote system and this route contain code for upvote or back vote there is not logic about down vote
     ```
+### Testing the API on Google
+- ####### 1. Go to https://google.com
+- ####### 2. Go to Developer Tools
+- ####### 1. Go to The Console Window
+- ####### 1. Type: fetch('http://localhost:8000/').then(result => result.json().then(console.log))
+
 
 ### How To Run Locally
 - ###### 1. First clone this repo by using following command
@@ -102,6 +108,20 @@
         pip install -r requirements.txt
     ```
 ---
+
+### Deploying the Application on Heroku
+- ###### 1. Command line arguments
+    ```bash
+    sudo snap install heroku --classic
+    heroku --version
+    heroku login
+    heroku create healthconnect-python-fastapi
+    # Pushing code to Heroku: git push heroku master
+        - git add --all
+        - git commmit -m "message"
+        - git push origin master
+        - git push heroku master
+    ```
 
 ---
 
