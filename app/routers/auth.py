@@ -24,3 +24,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post('/logout')
+def logout():
+    return { "message": "Functionality Under Construction." }
