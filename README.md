@@ -7,6 +7,11 @@
     - sudo apt-get update
     - sudo apt-get install python3-venv
     - python3 -m venv venv
+
+    - pip install virtualenv
+    - virtualenv -p python3 <env_name>
+    - source <env_name>/bin/activate
+    - deactivate
     ```
 
 - ###### Activating the Python Virtual Environment:
