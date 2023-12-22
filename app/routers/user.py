@@ -5,13 +5,12 @@ from ..database import get_db
 
 router = APIRouter(
     prefix="/users",
-    tags=['Users']
+    tags=['Accounts']
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
-    # hash the password - user.password
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
 
@@ -31,3 +30,8 @@ def get_user(id: int, db: Session = Depends(get_db), ):
                             detail=f"User with id: {id} does not exist")
 
     return user
+
+
+@router.put('/savedata')
+def savedata():
+    return { "status":"pending", "message": "Functionality Under Construction." }
