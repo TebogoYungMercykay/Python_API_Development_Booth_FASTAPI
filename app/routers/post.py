@@ -89,4 +89,4 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
 
 @router.get('/create_reply')
 def create_reply():
-    return { "message": "Functionality Under Construction." }
+    return { "status":"pending", "message": "Functionality Under Construction." }
