@@ -85,3 +85,8 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
     db.commit()
 
     return post_query.first()
+
+
+@router.get('/create_reply')
+def create_reply():
+    return { "message": "Functionality Under Construction." }
