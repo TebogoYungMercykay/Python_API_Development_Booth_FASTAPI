@@ -16,25 +16,25 @@ router = APIRouter(
 
 @router.get('/')
 def chat_messages():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.get('/get_feedback')
 def get_feedback():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/post_feedback')
 def post_feedback():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/whatsapp')
 def whatsapp():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/meeting')
 def meeting():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
