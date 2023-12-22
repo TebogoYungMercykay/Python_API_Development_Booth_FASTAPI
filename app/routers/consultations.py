@@ -15,30 +15,30 @@ router = APIRouter(
 
 @router.get('/')
 def consult_a_doctor():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/make_consultation')
 def make_consultation():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.get('/consultation_history')
 def consultation_history():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.get('/consultation_view')
 def consultation_view():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/close_consultation')
 def close_consultation():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/rate_review')
 def rate_review():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
