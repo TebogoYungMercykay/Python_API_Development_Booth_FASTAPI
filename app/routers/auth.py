@@ -27,4 +27,4 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
 
 @router.post('/logout')
 def logout():
-    return { "message": "Functionality Under Construction." }
+    return { "status":"pending", "message": "Functionality Under Construction." }
