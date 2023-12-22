@@ -15,10 +15,10 @@ router = APIRouter(
 
 @router.get('/')
 def checkdisease():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
 @router.post('/checkdisease')
 def checkdisease():
-    return { "message": MESSAGE_UNDER_CONSTRUCTION }
+    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
