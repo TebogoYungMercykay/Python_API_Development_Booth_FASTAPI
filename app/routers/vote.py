@@ -5,7 +5,7 @@ from .. import schemas, database, models, oauth2
 
 router = APIRouter(
     prefix="/vote",
-    tags=['Vote']
+    tags=['Like/Dislike Posts']
 )
 
 
