@@ -30,3 +30,8 @@ def get_user(id: int, db: Session = Depends(get_db), ):
                             detail=f"User with id: {id} does not exist")
 
     return user
+
+
+@router.put('/savedata')
+def savedata():
+    return { "message": "Functionality Under Construction." }
