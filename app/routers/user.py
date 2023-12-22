@@ -34,4 +34,4 @@ def get_user(id: int, db: Session = Depends(get_db), ):
 
 @router.put('/savedata')
 def savedata():
-    return { "message": "Functionality Under Construction." }
+    return { "status":"pending", "message": "Functionality Under Construction." }
