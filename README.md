@@ -64,7 +64,10 @@
 - ###### Go to https://google.com
 - ###### Go to Developer Tools
 - ###### Go to The Console Window
-- ###### Type: fetch('http://localhost:8000/').then(result => result.json().then(console.log))
+- ###### Type:
+    ```python
+    fetch('http://localhost:8000/').then(result => result.json().then(console.log))
+    ```
 
 
 ### How To Run Locally
