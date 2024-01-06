@@ -168,3 +168,4 @@ class Feedback(Base):
     created = Column(DateTime, nullable=False, server_default=text('now()'))
     sender_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     feedback = Column(Text, nullable=False)
+
