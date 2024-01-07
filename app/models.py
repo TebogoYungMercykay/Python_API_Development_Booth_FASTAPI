@@ -13,29 +13,16 @@ class Post(Base):
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     published = Column(Boolean, server_default='TRUE', nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),
-                        nullable=False, server_default=text('now()'))
-    owner_id = Column(Integer, ForeignKey(
-        "users.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     owner = relationship("User")
 
 
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True, nullable=False)
-    email = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),
-                        nullable=False, server_default=text('now()'))
-
-
 class Vote(Base):
     __tablename__ = "votes"
-    user_id = Column(Integer, ForeignKey(
-        "users.id", ondelete="CASCADE"), primary_key=True)
-    post_id = Column(Integer, ForeignKey(
-        "posts.id", ondelete="CASCADE"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)
     
 class User(Base):
     __tablename__ = "users"
@@ -52,11 +39,11 @@ class Patient(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     is_patient = Column(Boolean, default=True)
     is_doctor = Column(Boolean, default=False)
-    name = Column(String, nullable=False, max_length=50)
+    name = Column(String(50), nullable=False)
     dob = Column(DateTime, nullable=False)
-    address = Column(String, nullable=False, max_length=100)
-    mobile_no = Column(String, nullable=False, max_length=15)
-    gender = Column(String, nullable=False, max_length=10)
+    address = Column(String(100), nullable=False)
+    mobile_no = Column(String(15), nullable=False)
+    gender = Column(String(10), nullable=False)
 
     @property
     def age(self):
@@ -73,16 +60,16 @@ class Doctor(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, nullable=False)
     is_patient = Column(Boolean, default=False)
     is_doctor = Column(Boolean, default=True)
-    name = Column(String, nullable=False, max_length=50)
+    name = Column(String(50), nullable=False)
     dob = Column(DateTime, nullable=False)
-    address = Column(String, nullable=False, max_length=100)
-    mobile_no = Column(String, nullable=False, max_length=15)
-    gender = Column(String, nullable=False, max_length=10)
-    registration_no = Column(String, nullable=False, max_length=20)
+    address = Column(String(100), nullable=False)
+    mobile_no = Column(String(15), nullable=False)
+    gender = Column(String(10), nullable=False)
+    registration_no = Column(String(20), nullable=False)
     year_of_registration = Column(DateTime, nullable=False)
-    qualification = Column(String, nullable=False, max_length=20)
-    state_medical_council = Column(String, nullable=False, max_length=30)
-    specialization = Column(String, nullable=False, max_length=30)
+    qualification = Column(String(20), nullable=False)
+    state_medical_council = Column(String(30), nullable=False)
+    specialization = Column(String(30), nullable=False)
     rating = Column(Integer, default=0)
 
 
@@ -91,11 +78,11 @@ class DiseaseInfo(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     patient_id = Column(Integer, ForeignKey("patients.user_id", ondelete="SET NULL"), nullable=True)
-    diseasename = Column(String, nullable=False, max_length=200)
+    diseasename = Column(String(200), nullable=False)
     no_of_symp = Column(Integer, nullable=False)
     symptomsname = Column(Text, nullable=False)
     confidence = Column(Float, nullable=False)
-    consultdoctor = Column(String, nullable=False, max_length=200)
+    consultdoctor = Column(String(200), nullable=False)
 
 
 class Consultation(Base):
@@ -106,7 +93,7 @@ class Consultation(Base):
     doctor_id = Column(Integer, ForeignKey("doctors.user_id", ondelete="SET NULL"), nullable=True)
     diseaseinfo_id = Column(Integer, ForeignKey("diseaseinfos.id", ondelete="SET NULL"), nullable=True)
     consultation_date = Column(DateTime, nullable=False)
-    status = Column(String, nullable=False, max_length=20)
+    status = Column(String(20), nullable=False)
 
 
 class PublicPost(Base):
@@ -114,7 +101,7 @@ class PublicPost(Base):
 
     post_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), default=1)
-    post_header = Column(String, nullable=False, max_length=250)
+    post_header = Column(String(250), nullable=False)
     post_text = Column(Text, nullable=False)
     created_at = Column(DateTime, nullable=False, server_default=text('now()'))
 
