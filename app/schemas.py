@@ -79,7 +79,6 @@ class PatientCreate(UserCreate):
     address: str 
     mobile: int
     gender: str
-    age: int
 
 
 class DoctorCreate(PatientCreate):
