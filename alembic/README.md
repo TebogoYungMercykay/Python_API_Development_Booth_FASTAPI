@@ -1,9 +1,13 @@
 # Generic single-database configuration.
 
-- Using Alembic to Automatically Create and Update Database Tabes:
+- Review Previous Migrations:
     ```python
-    alembic revision autogenerate -m "{version_name}"
-    alembic upgrade head
+    alembic history
+    ```
+- Using Alembic to Automatically Create and Update Database Tables:
+    ```python
+    alembic revision --autogenerate -m "{version_name}"
+    alembic upgrade head # running the database migrations
     ```
 - Creating a Revision:
     ```python
