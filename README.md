@@ -65,7 +65,7 @@ Welcome to the FastAPI Python API Development project repository. This comprehen
     - python.exe -  pip install autopen8
     - Running the API:
         - univorn app/main:app
-        - univorn app/main:app --reload (for automatic updates)
+        - uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload (for automatic updates)
 
 - ###### Environment Variables:
     ```bash

@@ -25,6 +25,7 @@ This Nginx Reverse Proxy configuration is tailored for local development with a 
 
 
 ---
+---
 
 <p align="center">The End, Thank You!</p>
 
