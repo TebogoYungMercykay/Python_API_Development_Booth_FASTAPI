@@ -13,6 +13,7 @@ jobs:
     - name: Notificatiion
       uses: actions/github-script@v3
       with:
+        github-token: ${{secrets.FASTAPI_URL}}
         script: |
           const issueNumber = context.issue.number;
           const contributors = await github.repos.listContributors({
