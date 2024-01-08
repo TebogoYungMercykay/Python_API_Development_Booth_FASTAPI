@@ -6,7 +6,7 @@ This Nginx Reverse Proxy configuration is tailored for local development with a 
 
 ## Setup:
 
-1. **Configure Nginx:**
+- **Configure Nginx:**
    - Ensure Nginx is installed.
    - Update `/reverse-proxy/*.conf` to include additional configurations:
      ```nginx
@@ -17,10 +17,10 @@ This Nginx Reverse Proxy configuration is tailored for local development with a 
      sudo service nginx restart
      ```
 
-3. **Run FastAPI Server:**
+- **Run FastAPI Server:**
    - Ensure FastAPI is running on `localhost:8000`.
 
-4. **Access Application:**
+- **Access Application:**
    - Open your browser and visit [http://localhost](http://localhost).
 
 
