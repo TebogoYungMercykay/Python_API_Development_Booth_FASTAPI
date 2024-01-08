@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  notification-gang:
+  notification-job:
     runs-on: ubuntu-latest
     steps:
     - name: Notification
@@ -22,7 +22,7 @@ jobs:
             issue_number: issueNumber,
             body: 'A new pull request or push has been made.',
           });
-          
+
 
 # name: Build and Deploy Code to Docker and Heroku
 
