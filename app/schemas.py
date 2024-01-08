@@ -46,6 +46,21 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+class DoctorCreate(BaseModel):
+    email: str
+    name: str
+    surname: str
+    dob: datetime
+    gender: str
+    address: str
+    mobile: int
+    password: str
+    confirm_password: str
+    registration_no: str
+    year_of_registration: datetime
+    qualification: str
+    specialization: str
+    state_medical_council: str
 
 class UserLogin(BaseModel):
     email: EmailStr
