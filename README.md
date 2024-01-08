@@ -1,4 +1,4 @@
-# PYTHON FASTAPI DEVELOPMENT BOOTH REPOSITORY
+# PYTHON FASTAPI DEVELOPMENT BOOTH
 
 ![Python FastAPI, Image Credits: Amal G Jose](./project-Diagramns/python-fastapi_1200x600.png)
 

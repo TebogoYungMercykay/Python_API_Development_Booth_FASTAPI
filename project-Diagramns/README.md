@@ -6,15 +6,15 @@ Welcome to the **Diagrams** directory of our project! This directory houses visu
 
 ## Contents:
 
-1. **Architecture Diagrams:** Explore the high-level structure and relationships within our project. These diagrams offer a bird's-eye view of how different components interact.
+- **Architecture Diagrams:** Explore the high-level structure and relationships within our project. These diagrams offer a bird's-eye view of how different components interact.
 
-2. **Flowcharts:** Dive into the detailed workflows and processes that define key functionalities. Flowcharts are invaluable for grasping the sequential steps and decision points in our project.
+- **Flowcharts:** Dive into the detailed workflows and processes that define key functionalities. Flowcharts are invaluable for grasping the sequential steps and decision points in our project.
 
-3. **Data Flow Diagrams (DFD):** Understand how data moves through our system. DFDs illustrate the flow of information and the processes that manipulate it.
+- **Data Flow Diagrams (DFD):** Understand how data moves through our system. DFDs illustrate the flow of information and the processes that manipulate it.
 
-4. **Entity-Relationship Diagrams (ERD):** Delve into the relationships between different entities in our data model. ERDs help to visualize the database structure and connections.
+- **Entity-Relationship Diagrams (ERD):** Delve into the relationships between different entities in our data model. ERDs help to visualize the database structure and connections.
 
-5. **User Interface (UI) Mockups:** Preview the visual aspects of our project with UI mockups. These diagrams showcase the user interface design and user interaction patterns.
+- **User Interface (UI) Mockups:** Preview the visual aspects of our project with UI mockups. These diagrams showcase the user interface design and user interaction patterns.
 
 ---
 ---

@@ -28,8 +28,6 @@ Running the project locally in a Docker container. `Links`: [Docker Documentatio
                 image: tebogoyungmercykay/healthconnect:v1
                 ports:
                 - 80:8000
-                # env_file:
-                #   - .env
                 environment:
                 - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
                 - DATABASE_PORT=${DATABASE_PORT}
