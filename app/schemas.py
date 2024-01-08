@@ -21,7 +21,7 @@ class UserOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Post(PostBase):
@@ -31,7 +31,7 @@ class Post(PostBase):
     owner: UserOut
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PostOut(BaseModel):
@@ -39,13 +39,28 @@ class PostOut(BaseModel):
     votes: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+class DoctorCreate(BaseModel):
+    email: str
+    name: str
+    surname: str
+    dob: datetime
+    gender: str
+    address: str
+    mobile: int
+    password: str
+    confirm_password: str
+    registration_no: str
+    year_of_registration: datetime
+    qualification: str
+    specialization: str
+    state_medical_council: str
 
 class UserLogin(BaseModel):
     email: EmailStr

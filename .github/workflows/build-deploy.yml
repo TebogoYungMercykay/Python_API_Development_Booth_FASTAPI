@@ -1,3 +1,34 @@
+name: Notificatiion When There Is A Pull Request or Pull On Master
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  notification-gang:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notificatiion
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.FASTAPI_URL}}
+        script: |
+          const issueNumber = context.issue.number;
+          const contributors = await github.repos.listContributors({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          contributors.data.forEach(async (contributor) => {
+            await github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `@${contributor.login} A new pull request has been created.`,
+            });
+          });
+
 # name: Build and Deploy Code to Docker and Heroku
 
 # on:
