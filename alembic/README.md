@@ -7,7 +7,7 @@
 - Using Alembic to Automatically Create and Update Database Tables:
     ```python
     alembic revision --autogenerate -m "{version_name}"
-    alembic upgrade head # running the migrations
+    alembic upgrade head # running the database migrations
     ```
 - Creating a Revision:
     ```python
