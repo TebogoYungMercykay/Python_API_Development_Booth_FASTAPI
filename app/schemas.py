@@ -77,21 +77,28 @@ class PatientCreate(UserCreate):
     surname: str
     dob: datetime
     address: str 
-    mobile: int
+    mobile_no: int
     gender: str
 
 
 class DoctorCreate(PatientCreate):
+    qualification: str
     registration_no: str
+    year_of_registration: datetime
     state_medical_council: str
     specialization: str
-    year_of_registration: datetime
-    qualification: str
 
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class UserUpdate(BaseModel):
+    name: str
+    surname: str
+    address: str 
+    mobile: int
 
 
 class Token(BaseModel):
@@ -124,7 +131,7 @@ class RatingOut(BaseModel):
 class DiseaseCreate(BaseModel):
     diseasename: str
     no_of_symptoms: int
-    symptomsname: List(str)
+    symptoms: List[str]
     confidence: float
     consultdoctor: str
     
@@ -147,7 +154,7 @@ class ConsultationCreate(BaseModel):
 
 class ConsultationOut(BaseModel):
     patient_id: int
-    Consultations: List(ConsultationCreate)
+    Consultations: List[ConsultationCreate]
     
     class Config:
         from_attributes = True
@@ -157,6 +164,13 @@ class Chats(BaseModel):
     consultation_id: int
     created_at: datetime
     message: str
+    
+
+class ChatsOut(BaseModel):
+    consultation_id: int
+    created_at: datetime
+    message: str
+    sender_id: int
 
 
 class FeedbackCreate(BaseModel):
