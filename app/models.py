@@ -49,7 +49,7 @@ class Patient(Base):
     surname = Column(String(50), nullable=False)    
     dob = Column(DateTime, nullable=False)
     address = Column(String(100), nullable=False)
-    mobile_no = Column(String(15), nullable=False)
+    mobile_no = Column(String(15), nullable=True)
     gender = Column(String(10), nullable=False)
     is_patient = Column(Boolean, server_default='TRUE')
     is_doctor = Column(Boolean, server_default='FALSE')
@@ -71,7 +71,7 @@ class Doctor(Base):
     surname = Column(String(50), nullable=False)
     dob = Column(DateTime, nullable=False)
     address = Column(String(100), nullable=False)
-    mobile_no = Column(String(15), nullable=False)
+    mobile_no = Column(String(15), nullable=True)
     gender = Column(String(10), nullable=False)
     qualification = Column(String(20), nullable=False)
     registration_no = Column(String(20), nullable=False)
@@ -122,7 +122,7 @@ class RatingReview(Base):
     __tablename__ = "ratingreviews"
 
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    patient_id = Column(Integer, ForeignKey("patients.user_id", ondelete="SET NULL"), nullable=True)
+    patient_id = Column(Integer, ForeignKey("patients.patient_id", ondelete="SET NULL"), nullable=True)
     doctor_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="SET NULL"), nullable=True)
     rating = Column(Integer, server_default='0')
     review = Column(Text, nullable=True)
