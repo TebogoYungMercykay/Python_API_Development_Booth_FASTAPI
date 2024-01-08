@@ -45,6 +45,8 @@ Welcome to the FastAPI Python API Development project repository. This comprehen
 
     - pip install virtualenv
     - virtualenv -p python3 <env_name>
+
+    # activating and deactivating virtualenv
     - source <env_name>/bin/activate
     - deactivate
     ```
