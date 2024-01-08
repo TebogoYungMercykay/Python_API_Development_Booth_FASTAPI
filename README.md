@@ -21,11 +21,12 @@ Welcome to the FastAPI Python API Development project repository. This comprehen
 ## PROJECT STRUCTURE
 
 - **`app/`:** Main directory containing the FastAPI application code and different routes.
-- **`diagrams/`:** Directory containing diagrams illustrating system architecture, database schema, or any relevant visualizations.
-- **`proxy/`:** Directory with configurations for a reverse proxy, enabling seamless deployment and routing.
+- **`project-diagramns/`:** Directory containing diagrams illustrating system architecture, database schema, or any relevant visualizations.
+- **`reverse-proxy/`:** Directory with configurations for a reverse proxy, enabling seamless deployment and routing.
 - **`alembic/`:** Alembic configurations and migration scripts for managing database schema changes.
+- **`docker/`:** Running the FastAPI Project in a Docker Containerized Environment.
+- **`tests/`:** This directory houses unit tests for the FastAPI application, providing a robust testing suite to ensure the functionality and reliability of the codebase.
 - **`requirements.txt`:** File listing project dependencies for easy installation.
-- **`Dockerfile`:** Configuration for building a Docker image of the FastAPI application.
 - **`README.md`:** General documentation providing an overview of the project and instructions for setup and deployment.
 
 ## DATABASE TABLES DESIGN & RELATIONSHIPS
@@ -44,6 +45,8 @@ Welcome to the FastAPI Python API Development project repository. This comprehen
 
     - pip install virtualenv
     - virtualenv -p python3 <env_name>
+
+    # activating and deactivating virtualenv
     - source <env_name>/bin/activate
     - deactivate
     ```

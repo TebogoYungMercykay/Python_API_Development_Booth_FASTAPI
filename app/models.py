@@ -5,7 +5,7 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 
 from .database import Base
 
-# POSTS: Schemas and Pedantic Models
+# POSTS: Database Models
 
 class Post(Base):
     __tablename__ = "posts"
@@ -26,7 +26,7 @@ class Vote(Base):
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)
 
 
-# USERS: Schemas and Pedantic Models
+# USERS: Database Models
 
 class User(Base):
     __tablename__ = "users"
@@ -83,7 +83,7 @@ class Doctor(Base):
     is_doctor = Column(Boolean, server_default='TRUE')
 
 
-# Disease Information and Consultations
+# Disease Information and Consultations: Database Models
 
 class DiseaseInfo(Base):
     __tablename__ = "diseaseinfos"
