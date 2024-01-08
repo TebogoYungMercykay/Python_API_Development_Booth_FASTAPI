@@ -7,27 +7,22 @@ on:
     branches: [ master ]
 
 jobs:
-  notification-gang:
+  notification-job:
     runs-on: ubuntu-latest
     steps:
-    - name: Notificatiion
+    - name: Notification
       uses: actions/github-script@v3
       with:
         github-token: ${{secrets.FASTAPI_URL}}
         script: |
           const issueNumber = context.issue.number;
-          const contributors = await github.repos.listContributors({
+          await github.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
+            issue_number: issueNumber,
+            body: 'A new pull request or push has been made.',
           });
-          contributors.data.forEach(async (contributor) => {
-            await github.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              body: `@${contributor.login} A new pull request has been created.`,
-            });
-          });
+
 
 # name: Build and Deploy Code to Docker and Heroku
 
