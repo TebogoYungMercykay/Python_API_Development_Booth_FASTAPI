@@ -1,6 +1,6 @@
 # PYTHON FASTAPI DEVELOPMENT BOOTH
 
-![Python FastAPI, Image Credits: Amal G Jose](./project-Diagramns/python-fastapi_1200x600.png)
+![Python FastAPI, Image Credits: Amal G Jose](./project-diagramns/python-fastapi_1200x600.png)
 
 
 Welcome to the FastAPI Python API Development project repository. This comprehensive repository demonstrates modern best practices for building robust, high-performance, and efficient APIs using FastAPI in Python. It incorporates various technologies, including unit testing, continuous integration/deployment (CI/CD) with Docker and Heroku, database migration tools (Alembic), authentication with JWT tokens, virtual environment management, relational databases (Postgres), Uvicorn ASGI web server, and example routes showcasing different features. [Recommendation: Sanjeev Thiyagarajan - Python FastAPI Full Course](https://youtube.com/playlist?list=PL8VzFQ8k4U1L5QpSapVEzoSfob-4CR8zM&feature=shared).
@@ -31,7 +31,7 @@ Welcome to the FastAPI Python API Development project repository. This comprehen
 
 ## DATABASE TABLES DESIGN & RELATIONSHIPS
 
-![ERD Diagramn](./project-Diagramns/database-erd-diagramn-healthconnect.drawio.svg)
+![ERD Diagramn](./project-diagramns/database-erd-diagramn-healthconnect.drawio.svg)
 
 ---
 
