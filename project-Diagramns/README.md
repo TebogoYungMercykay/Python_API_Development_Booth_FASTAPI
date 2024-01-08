@@ -16,7 +16,7 @@ Welcome to the **Diagrams** directory of our project! This directory houses visu
 
 5. **User Interface (UI) Mockups:** Preview the visual aspects of our project with UI mockups. These diagrams showcase the user interface design and user interaction patterns.
 
-
+---
 ---
 
 <p align="center">The End, Thank You!</p>

@@ -27,8 +27,9 @@
 - ###### FastAPI:
     ```markdown
     - pip install fastapi[all]
-    - pip freeze
     - python.exe -  pip install autopen8
+    # checking the installed packages
+    - pip freeze # paste them in the requirements.txt file
     - Running the API:
         - univorn app/main:app
         - univorn app/main:app --reload (for automatic updates)
@@ -83,7 +84,7 @@
 
 - ###### 3. The go this repo folder in your local computer run follwoing command
     ```
-    uvicorn main:app --reload
+    uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
     ```
 
 - ###### 4. Then you can use following link to use the  API
@@ -132,6 +133,7 @@
         - git push heroku master
     ```
 
+---
 ---
 
 <p align="center">The End, Thank You!</p>
