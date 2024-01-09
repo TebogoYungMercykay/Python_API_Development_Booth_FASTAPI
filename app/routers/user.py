@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from .. import models, schemas, utils, oauth2
 from ..database import get_db
 
@@ -63,15 +63,18 @@ def get_user(id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User with id: {id} does not exist")
-    details = None
-    if user.is_patient:
-        details = db.query(models.Patient).filter(models.Patient.patient_id == id).first()
-    elif user.is_doctor:
-        details = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
+        
+    user_details = db.query(models.User, models.Patient, models.Doctor).\
+        outerjoin(models.Patient, models.Patient.patient_id == models.User.id).\
+        outerjoin(models.Doctor, models.Doctor.doctor_id == models.User.id).\
+        filter(models.User.id == id).first()
+        
+    user, patient, doctor = user_details
+    details = patient or doctor
         
     if not details:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User with id: {id} does not exist")
+                            detail=f"Details for User with id: {id} does not exist")
     return {
             "id": user.id,
             "email": user.email,
@@ -79,29 +82,32 @@ def get_user(id: int, db: Session = Depends(get_db)):
             "name": details.name,
             "surname": details.surname,
             "address": details.address,
-            "mobile": details.mobile_no,
+            "mobile_no": details.mobile_no,
         }
 
 
 @router.put('/savedata/{id}')
 def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    query = db.query(models.User).filter(models.User.id == id).first()
-    if not query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"user with id: {id} does not exist")
-    else:
-        if query.id == current_user.id:
-            if query.is_patient:
-                update_query = db.query(models.Patient).filter(models.Patient.patient_id == current_user.id)
-                update_query.update(update_user.dict(), synchronize_session=False)
-                db.commit()
-            elif query.is_doctor:
-                update_query = db.query(models.Doctor).filter(models.Doctor.doctor_id == current_user.id)
-                update_query.update(update_user.dict(), synchronize_session=False)
-                db.commit()
-            else:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                    detail=f"user with id: {id} does not exist")
+    print(current_user.id)
+    print(id)
+    if current_user.id != id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You are not authorized to perform this action.")
+    
+    patient_query = db.query(models.Patient).filter(models.Patient.patient_id == id).first()
+    doctor_query = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
 
-    return {"status": "success", "message": "User Data Successfully Updated."}
+    if not patient_query and not doctor_query:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user with id: {id} does not exist")
+
+    update_data = update_user.dict(exclude_unset=True)
+
+    if patient_query:
+        db.query(models.Patient).filter(models.Patient.patient_id == id).update(update_data, synchronize_session=False)
+    elif doctor_query:
+        db.query(models.Doctor).filter(models.Doctor.doctor_id == id).update(update_data, synchronize_session=False)
+
+    db.commit()
+
+    return { "status": "success", "message": "User Data Successfully Updated." }
 

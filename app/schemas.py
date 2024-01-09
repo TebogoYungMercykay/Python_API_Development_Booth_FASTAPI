@@ -98,14 +98,14 @@ class UserUpdate(BaseModel):
     name: str
     surname: str
     address: str 
-    mobile: int
+    mobile_no: int
 
 
 class DetailsOut(UserOut):
     name: str
     surname: str
     address: str
-    mobile: int
+    mobile_no: int
 
     class Config:
         from_attributes = True

@@ -27,8 +27,12 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
 
     return { "access_token": access_token, "token_type": "bearer" }
 
-@router.post('/logout')
-def logout(db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.post('/logout/{id}')
+def logout(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    if current_user.id != id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You are not authorized to perform this action.")
+        
     logout_query = db.query(models.User).filter(models.User.id == current_user.id)
     logout = logout_query.first()
     if not logout:
