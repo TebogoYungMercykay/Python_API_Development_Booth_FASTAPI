@@ -31,4 +31,4 @@ app.include_router(chats.router)
 
 @app.get("/")
 def root():
-    return { "message": "Hello World, This is my message" }
+    return { "status": "welcomed", "message": "Welcome, To The HealthConnect FastAPI" }

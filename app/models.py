@@ -26,6 +26,17 @@ class Vote(Base):
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)
 
 
+
+class Reply(Base):
+    __tablename__ = "replies"
+
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="CASCADE"))
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"))
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=text('now()'))
+
+
 # USERS: Database Models
 
 class User(Base):
@@ -106,16 +117,6 @@ class Consultation(Base):
     diseaseinfo_id = Column(Integer, ForeignKey("diseaseinfos.id", ondelete="SET NULL"), nullable=True)
     consultation_date = Column(DateTime, nullable=False)
     status = Column(String(20), nullable=False)
-
-
-class Reply(Base):
-    __tablename__ = "replies"
-
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="CASCADE"))
-    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"))
-    content = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=text('now()'))
 
 
 class RatingReview(Base):

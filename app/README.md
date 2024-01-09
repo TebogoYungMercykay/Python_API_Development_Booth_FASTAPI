@@ -3,7 +3,7 @@
 ### Quick Setup for Running the Python API
 
 - ###### Creating the Python Virtual Environment:
-    ```markdown
+    ```bash
     - sudo apt-get update
     - sudo apt-get install python3-venv
     - python3 -m venv venv
@@ -15,17 +15,17 @@
     ```
 
 - ###### Activating the Python Virtual Environment:
-    ```markdown
+    ```bash
     - source venv/bin/activate
     ```
 
 - ###### Deactivating the Python Virtual Environment:
-    ```markdown
+    ```bash
     - deactivate
     ```
 
 - ###### FastAPI:
-    ```markdown
+    ```bash
     - pip install fastapi[all]
     - python.exe -  pip install autopen8
     # checking the installed packages
@@ -38,29 +38,45 @@
 
 ### Some of the API Routes and Functionality
 
-- ###### 1. Post route
+- ###### Post route
 
-    ```markdown
-    This route is reponsible for creating post, deleting post, updating post and Checkinh post
+    ```bash
+    This route is reponsible for CRUD operations for posts/feed
     ```
 
-- ###### 2. Users route
+- ###### Users route
 
-    ```markdown
-    This route is about creating users and searching user by id
+    ```bash
+    This route is about CRUD operations for users
     ```
 
-- ###### 3. Auth route
+- ###### Auth route
 
-    ```markdown
-    This route is about login system
+    ```bash
+    This route is about login/logout system
     ```
 
-- ###### 4. Vote route
+- ###### Vote route
 
-    ```markdown
+    ```bash
     This route is about likes or vote system and this route contain code for upvote or back vote there is not logic about down vote
     ```
+
+- ###### Diseases route
+    ```bash
+    This route is Responsible for the CRUD operations on the diseases tables and the information
+    ```
+
+- ###### Chat
+    ```bash
+    This route is about the Chat/Video functionality between the Doctor and the Patient
+    ```
+
+- ###### Consultation route
+    ```bash
+    This route is responsible for the starting and ending a Consultation between the Doctor and the Patient
+    ```
+
 
 ### Testing the API on Google
 - ###### Go to https://google.com
@@ -97,19 +113,19 @@
 
 - ###### 1. Create a database in postgres then create a file name .env and write the following things in you file 
     ```
-    DATABASE_HOSTNAME = localhost
-    DATABASE_PORT = 5432
-    DATABASE_PASSWORD = passward_that_you_set
-    DATABASE_NAME = name_of_database
-    DATABASE_USERNAME = User_name
-    SECRET_KEY = 09d25e094faa2556c818166b7a99f6f0f4c3b88e8d3e7 
-    ALGORITHM = HS256
-    ACCESS_TOKEN_EXPIRE_MINUTES = 60(base)
+    DATABASE_HOSTNAME='DATABASE_HOSTNAME'
+    DATABASE_PORT='DATABASE_PORT'
+    DATABASE_PASSWORD='DATABASE_PASSWORD'
+    DATABASE_NAME='DATABASE_NAME'
+    DATABASE_USERNAME='DATABASE_USERNAME'
+    SECRET_KEY='SECRET_KEY'
+    ALGORITHM='ALGORITHM'
+    ACCESS_TOKEN_EXPIRE_MINUTES='ACCESS_TOKEN_EXPIRE_MINUTES'
     ```
 - ###### 2. Note: SECRET_KEY in this example is just a psudo key. You need to get a key for youself and you can get the SECRET_KEY from fastapi documantion
 
 - ###### 3. Installing Requirements:
-    ```markdown
+    ```bash
     - Using a Script to Skip Failed ones:
         - Making the File Executable:
             chmod +x requirements_script.sh
