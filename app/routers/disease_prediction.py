@@ -8,7 +8,7 @@ from .. import models, schemas, utils, oauth2
 from ..database import get_db
 
 model_path = "../trained_model"
-model = joblib.load(model_path)
+trained_model = joblib.load(model_path)
 
 MESSAGE_UNDER_CONSTRUCTION = "Functionality Under Construction."
 
@@ -17,16 +17,24 @@ router = APIRouter(
     tags=['Disease Prediction Model']
 )
 
-@router.get('/{id}', response_model=schemas.DiseaseOut)
-def checkdisease(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.get('/{id}', response_model=List[schemas.DiseaseOut])
+def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="You are not authorized to perform this action.")
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
+        
+    diseases = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.patient_id == current_user.id).all()
+    
+    all_diseases = []
+    for disease in diseases:
+        disease_out = schemas.DiseaseOut(**disease.dict())
+        all_diseases.append(disease_out)
+    
+    return all_diseases
 
 
 @router.post('/createdisease/{id}', response_model=schemas.DiseaseOut)
-def createdisease(id: int, disease_info: schemas.DiseaseCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="You are not authorized to perform this action.")
@@ -34,7 +42,26 @@ def createdisease(id: int, disease_info: schemas.DiseaseCreate, db: Session = De
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Number of symptoms cannot be less than 1.")
     
-    disease_info.no_of_symptoms = len(disease_info.symptoms)
+    num_symptoms = len(disease_info.symptoms)
+    symptoms = disease_info.symptoms
+    symptomslist = utils.get_symptoms_list()
+    
+    testingsymptoms = [0] * len(symptomslist)
+    
+    # for k in range(0, len(symptomslist)):
+    #     for z in symptoms:
+    #         if (z == symptomslist[k]):
+    #             testingsymptoms[k] = 1
+
+    for k, symptom in enumerate(symptomslist):
+        if symptom in symptoms:
+            testingsymptoms[k] = 1
+
+    inputtest = [testingsymptoms]
+    predict = trained_model.predict(inputtest)
+    confidence = trained_model.predict_proba(inputtest).max() * 100
+    predicted_disease = predict[0]
+    
     return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
