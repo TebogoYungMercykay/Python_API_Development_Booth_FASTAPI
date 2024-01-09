@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from typing import List, Optional
 
 from sqlalchemy import func
@@ -18,8 +18,24 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
     posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)\
             .filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
     return posts
 
+@router.get("/all_posts", response_model=List[schemas.PostOut])
+def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)\
+            .filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+            
+    replies = db.query(models.Reply).all()
+    for post in posts:
+        post[0].replies = []
+        for reply in replies:
+            if reply.post_id == post[0].id:
+                post[0].replies.append(reply)
+    
+    return posts
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
@@ -112,11 +128,12 @@ def create_reply(id: int, reply_post: schemas.Replies, db: Session = Depends(get
         }
 
 
-@router.get("/all_posts", response_model=List[schemas.AllPostOut])
-def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
-
-    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
-        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)\
-            .filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    return posts
+# @router.get("/all_posts", response_model=List[schemas.AllPostOut])
+# def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 12, skip: int = 0, search: Optional[str] = ""):
+#     post_alias = aliased(models.Post)
+#     reply_alias = aliased(models.Reply)
+#     posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+#         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)\
+#             .filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+#     return posts
 
