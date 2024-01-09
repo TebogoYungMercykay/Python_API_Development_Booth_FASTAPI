@@ -98,12 +98,12 @@ Welcome to the FastAPI Python API Development project repository. This comprehen
     pip install -r requirements.txt
 
     # Alternatively use the script to avoid some installation errors
-    bash myscript.sh
-    ./myscript.sh
+    bash requirements_script.sh
+    ./requirements_script.sh
 
     # If you encounter a permission error, you may need to make the script executable. You can do this with the following command:
-    chmod +x myscript.sh
-    ./myscript.sh
+    chmod +x requirements_script.sh
+    ./requirements_script.sh
     ```
 
 - **Run Locally:**
