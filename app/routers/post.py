@@ -71,7 +71,6 @@ def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends
 def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
-
     post = post_query.first()
 
     if post == None:
@@ -92,7 +91,6 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
 def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
-
     post = post_query.first()
 
     if post == None:
@@ -104,7 +102,6 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
                             detail="Not authorized to perform requested action")
 
     post_query.update(updated_post.dict(), synchronize_session=False)
-
     db.commit()
 
     return post_query.first()
