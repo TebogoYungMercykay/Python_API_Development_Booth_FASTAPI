@@ -24,6 +24,13 @@ class UserOut(BaseModel):
         from_attributes = True
 
 
+class DoctorOut(BaseModel):
+    name: str
+    surname: str
+    specialization: str
+    class Config:
+        from_attributes = True
+
 class Post(PostBase):
     id: int
     created_at: datetime
@@ -38,27 +45,38 @@ class Post(PostBase):
 class Replies(BaseModel):
     post_id: int
     content: str
-    created_at: datetime
-    doctor_id: int
-
 
 class RepliesOut(BaseModel):
+    post_id: int
     content: str
     created_at: datetime
-    doctor_name: str
-    doctor_surname: str
-    doctor_specialization: str
     
+    class Config:
+        from_attributes = True
+        
+
+class RepliesData(BaseModel):
+    reply: RepliesOut
+    doctor: DoctorOut
     class Config:
         from_attributes = True
 
 class PostOut(BaseModel):
     Post: Post
     votes: int
-    # Replies: List[RepliesOut]
 
     class Config:
         from_attributes = True
+
+
+class AllPostOut(BaseModel):
+    Post: Post
+    votes: int
+    replies: List[RepliesOut]
+
+    class Config:
+        from_attributes = True
+
 
 class Vote(BaseModel):
     post_id: int
@@ -98,7 +116,25 @@ class UserUpdate(BaseModel):
     name: str
     surname: str
     address: str 
-    mobile: int
+    mobile_no: int
+
+
+class DetailsOut(UserOut):
+    name: str
+    surname: str
+    address: str
+    mobile_no: int
+
+    class Config:
+        from_attributes = True
+
+
+class UserData(BaseModel):
+    user: UserOut
+    details: DetailsOut
+
+    class Config:
+        from_attributes = True
 
 
 class Token(BaseModel):
