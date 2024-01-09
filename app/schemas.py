@@ -77,6 +77,7 @@ class AllPostOut(BaseModel):
     class Config:
         from_attributes = True
 
+
 class Vote(BaseModel):
     post_id: int
     dir: conint(le=1)
