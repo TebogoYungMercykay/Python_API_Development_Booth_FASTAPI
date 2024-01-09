@@ -3,7 +3,7 @@ import joblib
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from .. import models, schemas, utils, oauth2
 from ..database import get_db
 
@@ -38,14 +38,12 @@ def checkdisease(id: int, disease_id: int, db: Session = Depends(get_db), curren
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="You are not authorized to perform this action.")
         
-    diseases = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.patient_id == current_user.id).all()
+    disease = db.query(models.DiseaseInfo).filter(and_(models.DiseaseInfo.patient_id == current_user.id, models.DiseaseInfo.id == disease_id)).first()
     
-    all_diseases = []
-    for disease in diseases:
-        disease_out = schemas.DiseaseOut(**disease.dict())
-        all_diseases.append(disease_out)
-    
-    return all_diseases
+    if not disease:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Disease with id: {disease_id} not found.")
+    return disease
 
 @router.post('/createdisease/{id}', response_model=schemas.DiseaseOut)
 def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
