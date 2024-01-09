@@ -165,11 +165,8 @@ class RatingOut(BaseModel):
 # Disease Information and Consultations
 
 class DiseaseCreate(BaseModel):
-    diseasename: str
     no_of_symptoms: int
     symptoms: List[str]
-    confidence: float
-    consultdoctor: str
     
 
 class DiseaseOut(BaseModel):
