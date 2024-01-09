@@ -101,6 +101,16 @@ class UserUpdate(BaseModel):
     mobile: int
 
 
+class DetailsOut(UserOut):
+    name: str
+    surname: str
+    address: str
+    mobile: int
+
+    class Config:
+        from_attributes = True
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
