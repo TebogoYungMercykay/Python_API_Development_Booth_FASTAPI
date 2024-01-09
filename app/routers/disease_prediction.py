@@ -32,6 +32,20 @@ def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depe
     
     return all_diseases
 
+@router.get('/checkdisease/{id}/{disease_id}', response_model=schemas.DiseaseOut)
+def checkdisease(id: int, disease_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    if current_user.id != id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You are not authorized to perform this action.")
+        
+    diseases = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.patient_id == current_user.id).all()
+    
+    all_diseases = []
+    for disease in diseases:
+        disease_out = schemas.DiseaseOut(**disease.dict())
+        all_diseases.append(disease_out)
+    
+    return all_diseases
 
 @router.post('/createdisease/{id}', response_model=schemas.DiseaseOut)
 def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
@@ -61,30 +75,12 @@ def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = D
     predict = trained_model.predict(inputtest)
     confidence = trained_model.predict_proba(inputtest).max() * 100
     predicted_disease = predict[0]
+    consultdoctor = utils.get_consult_doctor(predicted_disease)
     
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
-
-
-# class DiseaseCreate(BaseModel):
-#     no_of_symptoms: int
-#     symptoms: List[str]
+    store_disease = models.DiseaseInfo(patient_id=current_user.id, diseasename=predicted_disease, no_of_symp=num_symptoms, symptoms=symptoms, confidence=confidence, consultdoctor=consultdoctor)
+    db.add(store_disease)
+    db.commit()
+    db.refresh(store_disease)
     
+    return store_disease
 
-# class DiseaseOut(BaseModel):
-#     diseasename: str
-#     confidence: float
-#     consultdoctor: str
-    
-#     class Config:
-#         from_attributes = True
-
-# class DiseaseInfo(Base):
-#     __tablename__ = "diseaseinfos"
-
-#     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-#     patient_id = Column(Integer, ForeignKey("patients.patient_id", ondelete="SET NULL"), nullable=True)
-#     diseasename = Column(String(200), nullable=False)
-#     no_of_symp = Column(Integer, nullable=False)
-#     symptoms = Column(ARRAY(String), nullable=False)
-#     confidence = Column(Float, nullable=False)
-#     consultdoctor = Column(String(200), nullable=False)
