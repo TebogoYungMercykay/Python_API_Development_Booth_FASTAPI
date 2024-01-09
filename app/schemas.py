@@ -64,7 +64,15 @@ class RepliesData(BaseModel):
 class PostOut(BaseModel):
     Post: Post
     votes: int
-    # Replies: List[RepliesOut]
+
+    class Config:
+        from_attributes = True
+
+
+class AllPostOut(BaseModel):
+    Post: Post
+    votes: int
+    Replies: List[RepliesOut]
 
     class Config:
         from_attributes = True
