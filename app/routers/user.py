@@ -57,8 +57,12 @@ def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-@router.get('/{id}', response_model=schemas.DetailsOut)
-def get_user(id: int, db: Session = Depends(get_db)):
+@router.get('/{id}', response_model=schemas.UserData)
+def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    if current_user.id != id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You are not authorized to perform this action.")
+
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -76,20 +80,13 @@ def get_user(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Details for User with id: {id} does not exist")
     return {
-            "id": user.id,
-            "email": user.email,
-            "created_at": user.created_at,
-            "name": details.name,
-            "surname": details.surname,
-            "address": details.address,
-            "mobile_no": details.mobile_no,
+            "user": user,
+            "details": details
         }
 
 
 @router.put('/savedata/{id}')
 def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    print(current_user.id)
-    print(id)
     if current_user.id != id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="You are not authorized to perform this action.")
