@@ -23,19 +23,25 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
 
 @router.get("/all_posts", response_model=List[schemas.AllPostOut])
 def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+    posts_query = db.query(models.Post, func.count(models.Vote.post_id).label("votes"))\
+        .outerjoin(models.Vote, models.Vote.post_id == models.Post.id)\
+        .filter(models.Post.title.contains(search))\
+        .group_by(models.Post.id).limit(limit).offset(skip)
 
-    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
-        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)\
-            .filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-            
-    replies = db.query(models.Reply).all()
-    for post in posts:
-        post[0].replies = []
-        for reply in replies:
-            if reply.post_id == post[0].id:
-                post[0].replies.append(reply)
-    
-    return posts
+    posts_and_votes = posts_query.all()
+    replies_dict = {post.id: [] for post, _ in posts_and_votes}
+    replies_query = db.query(models.Reply).filter(models.Reply.post_id.in_([post.id for post, _ in posts_and_votes]))
+
+    for reply in replies_query.all():
+        replies_dict[reply.post_id].append(reply)
+
+    all_posts_out_list = []
+    for post, votes in posts_and_votes:
+        post_out = schemas.AllPostOut(Post=post, votes=votes, replies=replies_dict.get(post.id, []))
+        all_posts_out_list.append(post_out)
+
+    return all_posts_out_list
+
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
