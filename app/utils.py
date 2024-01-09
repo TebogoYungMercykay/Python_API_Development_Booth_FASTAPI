@@ -54,3 +54,48 @@ def get_disease_list():
         'Arthritis', '(vertigo) Paroymsal  Positional Vertigo', 'Acne', 'Urinary tract infection', 'Psoriasis', 'Impetigo'
     ]
     
+def map_disease_to_doctor(disease):
+    rheumatologist = ['Osteoarthristis', 'Arthritis']
+    cardiologist = ['Heart attack', 'Bronchial Asthma', 'Hypertension ']
+    ent_specialist = ['(vertigo) Paroymsal  Positional Vertigo', 'Hypothyroidism']
+    orthopedist = []
+    neurologist = ['Varicose veins', 'Paralysis (brain hemorrhage)', 'Migraine', 'Cervical spondylosis']
+    allergist_immunologist = ['Allergy', 'Pneumonia', 'AIDS', 'Common Cold', 'Tuberculosis', 'Malaria', 'Dengue', 'Typhoid']
+    urologist = ['Urinary tract infection', 'Dimorphic hemmorhoids(piles)']
+    dermatologist = ['Acne', 'Chicken pox', 'Fungal infection', 'Psoriasis', 'Impetigo']
+    gastroenterologist = [
+            'Peptic ulcer diseae', 'GERD', 'Chronic cholestasis', 'Drug Reaction', 'Gastroenteritis', 'Hepatitis E',
+            'Alcoholic hepatitis', 'Jaundice', 'hepatitis A', 'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Diabetes ', 'Hypoglycemia'
+        ]
+
+    consultdoctor = "other"
+    
+    if disease in rheumatologist:
+        consultdoctor = "Rheumatologist"
+
+    if disease in cardiologist:
+        consultdoctor = "Cardiologist"
+
+    elif disease in ent_specialist:
+        consultdoctor = "ENT specialist"
+
+    elif disease in orthopedist:
+        consultdoctor = "Orthopedist"
+
+    elif disease in neurologist:
+        consultdoctor = "Neurologist"
+
+    elif disease in allergist_immunologist:
+        consultdoctor = "Allergist/Immunologist"
+
+    elif disease in urologist:
+        consultdoctor = "Urologist"
+
+    elif disease in dermatologist:
+        consultdoctor = "Dermatologist"
+
+    elif disease in gastroenterologist:
+        consultdoctor = "Gastroenterologist"
+        
+        
+    return consultdoctor
