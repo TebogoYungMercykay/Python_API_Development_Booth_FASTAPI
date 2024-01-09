@@ -62,7 +62,7 @@ class RepliesData(BaseModel):
         from_attributes = True
 
 class PostOut(BaseModel):
-    post: Post
+    Post: Post
     votes: int
 
     class Config:
@@ -70,7 +70,7 @@ class PostOut(BaseModel):
 
 
 class AllPostOut(BaseModel):
-    post: Post
+    Post: Post
     votes: int
     replies: List[RepliesOut]
 
