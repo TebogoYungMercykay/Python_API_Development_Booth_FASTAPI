@@ -89,7 +89,7 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
 
 @router.post('/create_reply/{id}', response_model=schemas.RepliesData)
 def create_reply(id: int, reply_post: schemas.Replies, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == current_user.id).first()
     if not doctor or id != reply_post.post_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="You are not authorized to perform this action.")
