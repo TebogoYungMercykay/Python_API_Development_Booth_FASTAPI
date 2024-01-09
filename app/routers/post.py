@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from sqlalchemy import func
-from .. import models, schemas, oauth2
+from .. import models, schemas, utils, oauth2 
 from ..database import get_db
 
 
@@ -87,6 +87,26 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
     return post_query.first()
 
 
-@router.get('/create_reply')
-def create_reply():
-    return { "status":"pending", "message": "Functionality Under Construction." }
+@router.post('/create_reply/{id}', response_model=schemas.RepliesData)
+def create_reply(id: int, reply_post: schemas.Replies, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
+    if not doctor or id != reply_post.post_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="You are not authorized to perform this action.")
+
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with id: {id} does not exist")
+
+    new_post = models.Reply(user_id=current_user.id, **reply_post.dict())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    
+    
+    return {
+            "reply": new_post,
+            "doctor": doctor
+        }
+
