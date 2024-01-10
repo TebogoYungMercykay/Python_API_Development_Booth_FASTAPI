@@ -27,7 +27,7 @@ def calculate_average_rating(reviews):
 
 
 def group_reviews_by_doctor(reviews):
-    reviews_by_doctor = {}  # Dictionary to store reviews grouped by doctor_id
+    reviews_by_doctor = {}
 
     for review in reviews:
         if review.doctor_id not in reviews_by_doctor:
