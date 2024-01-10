@@ -161,7 +161,15 @@ class RatingOut(BaseModel):
     class Config:
         from_attributes = True
 
-   
+
+class RatingResponse(BaseModel):
+    doctor_id: int
+    average_rating: float
+    Ratings: List[RatingOut]
+
+    class Config:
+        from_attributes = True
+
 # Disease Information and Consultations
 
 class DiseaseCreate(BaseModel):
