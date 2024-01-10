@@ -4,8 +4,18 @@ from typing import Optional, List
 
 from pydantic.types import conint
 
+# JSON: Returned Result Structure
 
-# POSTS: Schemas and Pedantic Models
+class JSONResult(BaseModel):
+    status: int
+    id: int
+    # data: dict
+    
+    class Config:
+        from_attributes = True
+
+
+# POSTS: Schema
 
 class PostBase(BaseModel):
     title: str
@@ -26,6 +36,13 @@ class UserOut(BaseModel):
         from_attributes = True
 
 
+class JSONUserOut(JSONResult):
+    data: UserOut
+    
+    class Config:
+        from_attributes = True
+    
+
 class DoctorOut(BaseModel):
     name: str
     surname: str
@@ -34,10 +51,24 @@ class DoctorOut(BaseModel):
         from_attributes = True
 
 
+class JSONDoctorOut(JSONResult):
+    data: DoctorOut
+    
+    class Config:
+        from_attributes = True
+    
+
 class PatientOut(BaseModel):
     name: str
     surname: str
     dob: datetime
+    class Config:
+        from_attributes = True
+
+
+class JSONPatientOut(JSONResult):
+    data: PatientOut
+    
     class Config:
         from_attributes = True
 
@@ -65,6 +96,12 @@ class RepliesOut(BaseModel):
     class Config:
         from_attributes = True
         
+class JSONRepliesOut(JSONResult):
+    data: RepliesOut
+    
+    class Config:
+        from_attributes = True
+        
 
 class RepliesData(BaseModel):
     reply: RepliesOut
@@ -73,10 +110,24 @@ class RepliesData(BaseModel):
         from_attributes = True
 
 
+class JSONRepliesData(JSONResult):  
+    data: RepliesData
+    
+    class Config:
+        from_attributes = True
+        
+
 class PostOut(BaseModel):
     Post: Post
     votes: int
 
+    class Config:
+        from_attributes = True
+
+
+class JSONPostOut(JSONResult):
+    data: PostOut
+    
     class Config:
         from_attributes = True
 
@@ -90,12 +141,26 @@ class AllPostOut(BaseModel):
         from_attributes = True
 
 
+class JSONAllPostOut(JSONResult):
+    data: AllPostOut
+    
+    class Config:
+        from_attributes = True
+
+
 class Vote(BaseModel):
     post_id: int
     dir: conint(le=1)
 
 
-# USERS: Schemas and Pedantic Models
+class JSONVote(JSONResult):
+    data: Vote
+    
+    class Config:
+        from_attributes = True
+        
+
+# USERS: Schema
 
 
 class UserCreate(BaseModel):
@@ -142,10 +207,24 @@ class DetailsOut(UserOut):
         from_attributes = True
 
 
+class JSONDetailsOut(JSONResult):
+    data: DetailsOut
+    
+    class Config:
+        from_attributes = True
+
+
 class UserData(BaseModel):
     user: UserOut
     details: DetailsOut
 
+    class Config:
+        from_attributes = True
+
+
+class JSONUserData(JSONResult):
+    data: UserData
+    
     class Config:
         from_attributes = True
 
@@ -155,11 +234,17 @@ class Token(BaseModel):
     token_type: str
 
 
+class JSONToken(JSONResult):
+    data: Token
+    
+    class Config:
+        from_attributes = True
+
 class TokenData(BaseModel):
     id: Optional[str] = None
 
 
-# Rating and Reviews
+# REATINGS: Schema
 
 
 class RatingCreate(BaseModel):
@@ -176,6 +261,13 @@ class RatingOut(BaseModel):
         from_attributes = True
 
 
+class JSONRatingOut(JSONResult):
+    data: RatingOut
+    
+    class Config:
+        from_attributes = True
+
+
 class RatingResponse(BaseModel):
     doctor_id: int
     average_rating: float
@@ -185,7 +277,14 @@ class RatingResponse(BaseModel):
         from_attributes = True
 
 
-# Disease Information
+class JSONRatingResponse(JSONResult):
+    data: RatingResponse
+    
+    class Config:
+        from_attributes = True
+
+
+# DISEASE: Schema
 
 
 class DiseaseCreate(BaseModel):
@@ -202,7 +301,14 @@ class DiseaseOut(BaseModel):
         from_attributes = True
 
 
-# Consultations
+class JSONDiseaseOut(JSONResult):
+    data: DiseaseOut
+    
+    class Config:
+        from_attributes = True
+
+
+# CONSULTATION: Schema
 
  
 class ConsultationCreate(BaseModel):
@@ -220,6 +326,13 @@ class ConsultationOut(BaseModel):
     class Config:
         from_attributes = True
 
+
+class JSONConsultationOut(JSONResult):
+    data: ConsultationOut
+    
+    class Config:
+        from_attributes = True
+        
 
 class ConsultationResponse(BaseModel):
     count: int
@@ -239,13 +352,27 @@ class PatientConsultationOut(BaseModel):
     class Config:
         from_attributes = True
        
-       
+
+class JSONPatientConsultationOut(JSONResult):
+    data: PatientConsultationOut
+    
+    class Config:
+        from_attributes = True
+
+
 class PatientConsultationResponse(BaseModel):
     count: int
     Consultations: List[PatientConsultationOut]
     
     class Config:
         from_attributes = True    
+        
+
+class JSONPatientConsultationResponse(JSONResult):
+    data: PatientConsultationResponse
+    
+    class Config:
+        from_attributes = True
         
 
 class DoctorConsultationOut(BaseModel):
@@ -257,7 +384,14 @@ class DoctorConsultationOut(BaseModel):
     
     class Config:
         from_attributes = True
-        
+
+
+class JSONDoctorConsultationOut(JSONResult):
+    data: DoctorConsultationOut
+    
+    class Config:
+        from_attributes = True
+
         
 class DoctorConsultationResponse(BaseModel):
     count: int
@@ -267,7 +401,14 @@ class DoctorConsultationResponse(BaseModel):
         from_attributes = True 
 
 
-# CHATS: The Chatting System
+class JSONDoctorConsultationResponse(JSONResult):
+    data: DoctorConsultationResponse
+    
+    class Config:
+        from_attributes = True
+
+
+# CHATS: Schema
         
 
 class Chat(BaseModel):
@@ -283,9 +424,23 @@ class ChatOut(BaseModel):
         from_attributes = True
   
 
+class JSONChatOut(JSONResult):
+    data: ChatOut
+    
+    class Config:
+        from_attributes = True
+
+
 class ChatList(BaseModel):
     consultation_id: int
     chats: list[ChatOut]
+    class Config:
+        from_attributes = True
+
+
+class JSONChatList(JSONResult):
+    data: ChatList
+    
     class Config:
         from_attributes = True
 
@@ -303,6 +458,13 @@ class FeedbackOutput(BaseModel):
         from_attributes = True
 
 
+class JSONFeedbackCreate(JSONResult):
+    data: FeedbackOutput
+    
+    class Config:
+        from_attributes = True
+
+
 class Sender(BaseModel):
     name: str
     surname: str
@@ -310,12 +472,26 @@ class Sender(BaseModel):
     class Config:
         from_attributes = True
 
+
+class JSONSender(JSONResult):
+    data: Sender
+    
+    class Config:
+        from_attributes = True
+
+
 class FeedbackOut(FeedbackCreate):
     sender: Sender
     
     class Config:
         from_attributes = True
 
+
+class JSONFeedbackOut(JSONResult):
+    data: FeedbackOut
+    
+    class Config:
+        from_attributes = True
 
 class FeedbackResponse(BaseModel):
     doctor_id: int
@@ -325,3 +501,9 @@ class FeedbackResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class JSONFeedbackResponse(JSONResult):
+    data: FeedbackResponse
+    
+    class Config:
+        from_attributes = True
+        
