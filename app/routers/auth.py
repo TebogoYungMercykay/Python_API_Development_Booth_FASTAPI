@@ -7,6 +7,7 @@ from .. import database, schemas, models, utils, oauth2
 
 router = APIRouter(tags=['Authentication'])
 
+MESSAGE_INVALID = "Invalid user Credentials."
 
 @router.post('/login', response_model=schemas.JSONToken)
 def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
@@ -18,7 +19,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
         error_response = {
             "status": "error",
             "id": -1,
-            "data": "Invalid Credentials"
+            "data": MESSAGE_INVALID
         }
         return JSONResponse(content=error_response, status_code=403)
 
@@ -26,7 +27,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
         error_response = {
             "status": "error",
             "id": -1,
-            "data": "Invalid Credentials"
+            "data": MESSAGE_INVALID
         }
         return JSONResponse(content=error_response, status_code=403)
 
@@ -53,7 +54,7 @@ def logout(id: int, db: Session = Depends(database.get_db), current_user: int = 
         error_response = {
             "status": "error",
             "id": -1,
-            "data": "Invalid Credentials"
+            "data": MESSAGE_INVALID
         }
         return JSONResponse(content=error_response, status_code=403)
 
