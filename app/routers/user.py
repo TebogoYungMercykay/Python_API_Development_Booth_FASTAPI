@@ -2,11 +2,15 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session, joinedload
 from .. import models, schemas, utils, oauth2
 from ..database import get_db
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/users",
     tags=['Accounts']
 )
+
+MESSAGE_UNAUTHORIZED = "You are not authorized to perform this action."
+MESSAGE_EMAIL = "Your email address already exists in our database."
 
 # @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 # def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -25,8 +29,12 @@ router = APIRouter(
 def signup_patient(user: schemas.PatientCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Email already registered.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_EMAIL
+        }
+        return JSONResponse(content=error_response, status_code=400)
     
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
@@ -47,8 +55,12 @@ def signup_patient(user: schemas.PatientCreate, db: Session = Depends(get_db)):
 def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Email already registered.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_EMAIL
+        }
+        return JSONResponse(content=error_response, status_code=400)
     
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
@@ -68,13 +80,21 @@ def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
 @router.get('/{id}', response_model=schemas.UserData)
 def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="You are not authorized to perform this action.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
 
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User with id: {id} does not exist")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"User with id: {id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
         
     user_details = db.query(models.User, models.Patient, models.Doctor).\
         outerjoin(models.Patient, models.Patient.patient_id == models.User.id).\
@@ -85,8 +105,13 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
     details = patient or doctor
         
     if not details:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Details for User with id: {id} does not exist")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Details for User with id: {id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
     return {
             "user": user,
             "details": details
@@ -96,8 +121,12 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
 @router.put('/savedata/{id}')
 def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="You are not authorized to perform this action.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
     
     patient_query = db.query(models.Patient).filter(models.Patient.patient_id == id)
     doctor_query = db.query(models.Doctor).filter(models.Doctor.doctor_id == id)
@@ -106,7 +135,12 @@ def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get
     doctor = doctor_query.first()
     
     if not patient and not doctor:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user with id: {id} does not exist")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"user with id: {id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
 
     update_data = update_user.dict(exclude_unset=True)
 
@@ -118,5 +152,5 @@ def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get
 
     db.commit()
 
-    return { "status": "success", "message": "User Data Successfully Updated." }
+    return { "status": "success", "id": -1, "data": "User Data Successfully Updated." }
 
