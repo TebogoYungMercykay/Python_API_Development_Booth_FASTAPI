@@ -26,6 +26,18 @@ def calculate_average_rating(reviews):
     return round(average_rating, 2)
 
 
+def group_reviews_by_doctor(reviews):
+    reviews_by_doctor = {}  # Dictionary to store reviews grouped by doctor_id
+
+    for review in reviews:
+        if review.doctor_id not in reviews_by_doctor:
+            reviews_by_doctor[review.doctor_id] = []
+
+        reviews_by_doctor[review.doctor_id].append(review)
+
+    return reviews_by_doctor
+
+
 def get_symptoms_list():
     return [
         'itching', 'skin_rash', 'nodal_skin_eruptions', 'continuous_sneezing', 'shivering', 'chills', 'joint_pain',
