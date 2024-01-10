@@ -91,18 +91,22 @@ def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="You are not authorized to perform this action.")
     
-    patient_query = db.query(models.Patient).filter(models.Patient.patient_id == id).first()
-    doctor_query = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
+    patient_query = db.query(models.Patient).filter(models.Patient.patient_id == id)
+    doctor_query = db.query(models.Doctor).filter(models.Doctor.doctor_id == id)
 
-    if not patient_query and not doctor_query:
+    patient = patient_query.first()
+    doctor = doctor_query.first()
+    
+    if not patient and not doctor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user with id: {id} does not exist")
 
     update_data = update_user.dict(exclude_unset=True)
 
-    if patient_query:
-        db.query(models.Patient).filter(models.Patient.patient_id == id).update(update_data, synchronize_session=False)
-    elif doctor_query:
-        db.query(models.Doctor).filter(models.Doctor.doctor_id == id).update(update_data, synchronize_session=False)
+    if patient:
+        patient_query.update(update_data, synchronize_session=False)
+
+    else:
+        doctor_query.update(update_data, synchronize_session=False)
 
     db.commit()
 
