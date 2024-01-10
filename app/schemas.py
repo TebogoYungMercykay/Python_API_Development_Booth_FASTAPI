@@ -291,7 +291,6 @@ class ChatList(BaseModel):
 
 
 class FeedbackCreate(BaseModel):
-    created_at: datetime
     feedback: str
 
 
