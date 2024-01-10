@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session, aliased
 from typing import List, Optional
+from fastapi.responses import JSONResponse
 
 from sqlalchemy import func
 from .. import models, schemas, utils, oauth2 
 from ..database import get_db
 
+MESSAGE_UNAUTHORIZED = "You are not authorized to perform this action."
 
 router = APIRouter(
     prefix="/posts",
@@ -19,6 +21,14 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)\
             .filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
+    if not posts:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "Posts not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+    
     return posts
 
 @router.get("/all_posts", response_model=List[schemas.AllPostOut])
@@ -29,6 +39,15 @@ def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
         .group_by(models.Post.id).limit(limit).offset(skip)
 
     posts_and_votes = posts_query.all()
+    
+    if not posts_and_votes:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "Posts not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+    
     replies_dict = {post.id: [] for post, _ in posts_and_votes}
     replies_query = db.query(models.Reply).filter(models.Reply.post_id.in_([post.id for post, _ in posts_and_votes]))
 
@@ -61,8 +80,12 @@ def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
 
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id: {id} was not found")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"post with id: {id} was not found"
+        }
+        return JSONResponse(content=error_response, status_code=404)
 
     return post
 
@@ -74,12 +97,20 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
     post = post_query.first()
 
     if post == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id: {id} does not exist")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"post with id: {id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
 
     if post.owner_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Not authorized to perform requested action")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
 
     post_query.delete(synchronize_session=False)
     db.commit()
@@ -94,12 +125,20 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
     post = post_query.first()
 
     if post == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id: {id} does not exist")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"post with id: {id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
 
     if post.owner_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Not authorized to perform requested action")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
 
     post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
@@ -111,13 +150,21 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
 def create_reply(id: int, reply_post: schemas.Replies, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == current_user.id).first()
     if not doctor or id != reply_post.post_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="You are not authorized to perform this action.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if post == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id: {id} does not exist")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"post with id: {id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
 
     new_post = models.Reply(user_id=current_user.id, **reply_post.dict())
     db.add(new_post)
