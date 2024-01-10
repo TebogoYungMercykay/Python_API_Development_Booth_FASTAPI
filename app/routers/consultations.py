@@ -38,8 +38,8 @@ def close_consultation():
     return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
-@router.post('/rate_review/{id}', response_model=schemas.RatingOut)
-def rate_review(id: int, review_details: schemas.RatingCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.post('/create_review/{id}', response_model=schemas.RatingOut)
+def create_review(id: int, review_details: schemas.RatingCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if id == current_user.id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="You cannot rate/review yourself.")
