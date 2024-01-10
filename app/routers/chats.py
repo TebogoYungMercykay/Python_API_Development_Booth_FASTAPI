@@ -16,7 +16,7 @@ router = APIRouter(
 
 @router.post('/chat_messages/{id}', response_model=schemas.ChatList)
 def chat_messages(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    chats = db.query(models.Chat).filter(models.Chat.id == id).all()
+    chats = db.query(models.Chat).filter(models.Chat.consultation_id == id).all()
     if not chats:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Chat with id {id} not found")
@@ -41,15 +41,15 @@ def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db)
 
 @router.post('/user_feedback/{id}', response_model=schemas.FeedbackResponse)
 def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    doctor = db.query(models.Doctor).filter(models.Doctor.id == id).first()
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
     if not doctor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"There is Currently no Feedback from Doctors for user, id: {id}")
         
-    reviews = db.query(models.Feedback).filter(models.Feedback.doctor_id == id).all()
+    reviews = db.query(models.Feedback).filter(models.Feedback.receiver_id == id).all()
     if not reviews:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"There is Currently no Feedback from Doctors for user, id: {id}")
+                            detail=f"There is Currently no Feedback with id: {id}")
     
     list_feedback = []
     for single_feedback in reviews:
@@ -65,12 +65,12 @@ def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Dep
 
 @router.post('/post_feedback/{id}', response_model=schemas.FeedbackOutput)
 def post_feedback(id: int, message: schemas.FeedbackCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    doctor = db.query(models.Doctor).filter(models.Doctor.id == id).first()
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
     if not doctor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Doctor with id {id} not found")
     
-    new_feedback = models.Feedback(sender_id=current_user.id, **message.dict())
+    new_feedback = models.Feedback(sender_id=current_user.id, receiver_id=id, **message.dict())
 
     db.add(new_feedback)
     db.commit()
