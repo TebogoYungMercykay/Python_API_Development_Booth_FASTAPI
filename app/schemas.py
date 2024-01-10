@@ -41,7 +41,6 @@ class Post(PostBase):
         from_attributes = True
 
 
-
 class Replies(BaseModel):
     post_id: int
     content: str
