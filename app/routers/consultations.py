@@ -84,7 +84,7 @@ def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depen
     reviews = db.query(models.RatingReview).filter(models.RatingReview.doctor_id == id).all()
     
     if not reviews:
-        raise HTTPException(status_code=404, detail="Doctor with id: {id} not found")
+        raise HTTPException(status_code=404, detail="Reviews for Doctor with id: {id} not found")
     
     average_rating = utils.calculate_average_rating(reviews)
     result = schemas.RatingResponse(doctor_id=id, average_rating=average_rating, Ratings=reviews)
