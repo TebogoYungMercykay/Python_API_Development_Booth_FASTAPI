@@ -1,14 +1,16 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
-import joblib
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from sqlalchemy import func, and_
 from .. import models, schemas, utils, oauth2
 from ..database import get_db
+import warnings
+import joblib as jb
 
-model_path = "../trained_model"
-trained_model = joblib.load(model_path)
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+
+trained_model = jb.load('trained_model')
 
 MESSAGE_UNDER_CONSTRUCTION = "Functionality Under Construction."
 
@@ -59,22 +61,25 @@ def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = D
     symptoms = disease_info.symptoms
     symptomslist = utils.get_symptoms_list()
     
-    testingsymptoms = [0] * len(symptomslist)
+    testingsymptoms = []
+    for x in range(0, len(symptomslist)):
+                testingsymptoms.append(0)    
     
-    # for k in range(0, len(symptomslist)):
-    #     for z in symptoms:
-    #         if (z == symptomslist[k]):
-    #             testingsymptoms[k] = 1
+    for k in range(0, len(symptomslist)):
+        for z in symptoms:
+            if (z == symptomslist[k]):
+                testingsymptoms[k] = 1
 
-    for k, symptom in enumerate(symptomslist):
-        if symptom in symptoms:
-            testingsymptoms[k] = 1
+    # for k, symptom in enumerate(symptomslist):
+    #     if symptom in symptoms:
+    #         testingsymptoms[k] = 1
 
     inputtest = [testingsymptoms]
     predict = trained_model.predict(inputtest)
-    confidence = trained_model.predict_proba(inputtest).max() * 100
+    confidencescore = trained_model.predict_proba(inputtest)
+    confidence = confidencescore.max() * 100
     predicted_disease = predict[0]
-    consultdoctor = utils.get_consult_doctor(predicted_disease)
+    consultdoctor = utils.map_disease_to_doctor(predicted_disease)
     
     store_disease = models.DiseaseInfo(patient_id=current_user.id, diseasename=predicted_disease, no_of_symp=num_symptoms, symptoms=symptoms, confidence=confidence, consultdoctor=consultdoctor)
     db.add(store_disease)
@@ -82,4 +87,5 @@ def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = D
     db.refresh(store_disease)
     
     return store_disease
+
 
