@@ -4,7 +4,9 @@ from typing import Optional, List
 
 from pydantic.types import conint
 
+
 # POSTS: Schemas and Pedantic Models
+
 class PostBase(BaseModel):
     title: str
     content: str
@@ -28,6 +30,14 @@ class DoctorOut(BaseModel):
     name: str
     surname: str
     specialization: str
+    class Config:
+        from_attributes = True
+
+
+class PatientOut(BaseModel):
+    name: str
+    surname: str
+    dob: datetime
     class Config:
         from_attributes = True
 
@@ -86,6 +96,7 @@ class Vote(BaseModel):
 
 
 # USERS: Schemas and Pedantic Models
+
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -150,6 +161,7 @@ class TokenData(BaseModel):
 
 # Rating and Reviews
 
+
 class RatingCreate(BaseModel):
     rating: float
     review: str
@@ -173,7 +185,7 @@ class RatingResponse(BaseModel):
         from_attributes = True
 
 
-# Disease Information and Consultations
+# Disease Information
 
 
 class DiseaseCreate(BaseModel):
@@ -189,7 +201,10 @@ class DiseaseOut(BaseModel):
     class Config:
         from_attributes = True
 
-        
+
+# Consultations
+
+ 
 class ConsultationCreate(BaseModel):
     doctor_id: int
     diseaseinfo_id: int
@@ -198,13 +213,60 @@ class ConsultationCreate(BaseModel):
 
 
 class ConsultationOut(BaseModel):
+    id: int
+    consultation_date: datetime
+    status: str
+    
+    class Config:
+        from_attributes = True
+
+
+class ConsultationResponse(BaseModel):
+    count: int
+    Consultations: List[ConsultationOut]
+    
+    class Config:
+        from_attributes = True
+        
+
+class PatientConsultationOut(BaseModel):
     patient_id: int
-    Consultations: List[ConsultationCreate]
+    consultation_date: datetime
+    status: str
+    doctor: DoctorOut
+    diseaseinfo: DiseaseOut
+    
+    class Config:
+        from_attributes = True
+       
+       
+class PatientConsultationResponse(BaseModel):
+    count: int
+    Consultations: List[PatientConsultationOut]
+    
+    class Config:
+        from_attributes = True    
+        
+
+class DoctorConsultationOut(BaseModel):
+    doctor_id: int
+    consultation_date: datetime
+    status: str
+    patient: PatientOut
+    diseaseinfo: DiseaseOut
     
     class Config:
         from_attributes = True
         
         
+class DoctorConsultationResponse(BaseModel):
+    count: int
+    Consultations: List[DoctorConsultationOut]
+    
+    class Config:
+        from_attributes = True 
+
+
 class Chats(BaseModel):
     consultation_id: int
     created_at: datetime
