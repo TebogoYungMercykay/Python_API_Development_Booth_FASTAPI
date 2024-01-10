@@ -31,6 +31,7 @@ class DoctorOut(BaseModel):
     class Config:
         from_attributes = True
 
+
 class Post(PostBase):
     id: int
     created_at: datetime
@@ -41,10 +42,10 @@ class Post(PostBase):
         from_attributes = True
 
 
-
 class Replies(BaseModel):
     post_id: int
     content: str
+
 
 class RepliesOut(BaseModel):
     post_id: int
@@ -60,6 +61,7 @@ class RepliesData(BaseModel):
     doctor: DoctorOut
     class Config:
         from_attributes = True
+
 
 class PostOut(BaseModel):
     Post: Post
@@ -149,20 +151,30 @@ class TokenData(BaseModel):
 # Rating and Reviews
 
 class RatingCreate(BaseModel):
-    rating: int
+    rating: float
     review: str
     doctor_id: int
 
 
 class RatingOut(BaseModel):
-    rating: int
+    rating: float
     review: str
 
     class Config:
         from_attributes = True
 
-   
+
+class RatingResponse(BaseModel):
+    doctor_id: int
+    average_rating: float
+    Ratings: List[RatingOut]
+
+    class Config:
+        from_attributes = True
+
+
 # Disease Information and Consultations
+
 
 class DiseaseCreate(BaseModel):
     no_of_symptoms: int
@@ -222,4 +234,4 @@ class FeedbackResponse(BaseModel):
     
     class Config:
         from_attributes = True
-        
+

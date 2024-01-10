@@ -6,6 +6,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_current_time():
     return datetime.now()
 
+
 # TODO: I will Create a new Hash Algorithm Here.
 
 def hash(password: str):
@@ -14,6 +15,28 @@ def hash(password: str):
 
 def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+
+def calculate_average_rating(reviews):
+    if not reviews:
+        return 0.0
+
+    total_rating = sum(review.rating for review in reviews)
+    average_rating = total_rating / len(reviews)
+    return round(average_rating, 2)
+
+
+def group_reviews_by_doctor(reviews):
+    reviews_by_doctor = {}
+
+    for review in reviews:
+        if review.doctor_id not in reviews_by_doctor:
+            reviews_by_doctor[review.doctor_id] = []
+
+        reviews_by_doctor[review.doctor_id].append(review)
+
+    return reviews_by_doctor
+
 
 def get_symptoms_list():
     return [
@@ -44,6 +67,7 @@ def get_symptoms_list():
         'yellow_crust_ooze'
     ]
     
+
 def get_disease_list():
     return [
         'Fungal infection', 'Allergy', 'GERD', 'Chronic cholestasis', 'Drug Reaction', 'Peptic ulcer diseae', 'AIDS', 'Diabetes ',
@@ -53,6 +77,7 @@ def get_disease_list():
         'Heart attack', 'Varicose veins', 'Hypothyroidism', 'Hyperthyroidism', 'Hypoglycemia', 'Osteoarthristis',
         'Arthritis', '(vertigo) Paroymsal  Positional Vertigo', 'Acne', 'Urinary tract infection', 'Psoriasis', 'Impetigo'
     ]
+
     
 def map_disease_to_doctor(disease):
     rheumatologist = ['Osteoarthristis', 'Arthritis']
@@ -97,5 +122,5 @@ def map_disease_to_doctor(disease):
     elif disease in gastroenterologist:
         consultdoctor = "Gastroenterologist"
         
-        
     return consultdoctor
+
