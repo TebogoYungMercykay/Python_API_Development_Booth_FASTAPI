@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from fastapi.responses import JSONResponse
 
 from sqlalchemy import func, and_
 from .. import models, schemas, utils, oauth2
@@ -13,6 +14,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 trained_model = jb.load('trained_model')
 
 MESSAGE_UNDER_CONSTRUCTION = "Functionality Under Construction."
+MESSAGE_UNAUTHORIZED = "You are not authorized to perform this action."
 
 router = APIRouter(
     prefix="/disease_prediction",
@@ -22,8 +24,12 @@ router = APIRouter(
 @router.get('/{id}', response_model=List[schemas.DiseaseOut])
 def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="You are not authorized to perform this action.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
         
     diseases = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.patient_id == current_user.id).all()
     
@@ -32,25 +38,43 @@ def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depe
 @router.get('/checkdisease/{id}/{disease_id}', response_model=schemas.DiseaseOut)
 def checkdisease(id: int, disease_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="You are not authorized to perform this action.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=401)
         
     disease = db.query(models.DiseaseInfo).filter(and_(models.DiseaseInfo.patient_id == current_user.id, models.DiseaseInfo.id == disease_id)).first()
     
     if not disease:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Disease with id: {disease_id} not found.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Disease with id: {disease_id} not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
     return disease
 
 
 @router.post('/createdisease/{id}', response_model=schemas.DiseaseOut)
 def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="You are not authorized to perform this action.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": MESSAGE_UNAUTHORIZED
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
     elif len(disease_info.symptoms) < 1:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Number of symptoms cannot be less than 1.")
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "Number of symptoms cannot be less than 1."
+        }
+        return JSONResponse(content=error_response, status_code=400)
     
     num_symptoms = len(disease_info.symptoms)
     symptoms = disease_info.symptoms
@@ -64,10 +88,6 @@ def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = D
         for z in symptoms:
             if (z == symptomslist[k]):
                 testingsymptoms[k] = 1
-
-    # for k, symptom in enumerate(symptomslist):
-    #     if symptom in symptoms:
-    #         testingsymptoms[k] = 1
 
     inputtest = [testingsymptoms]
     predict = trained_model.predict(inputtest)
