@@ -25,7 +25,7 @@ MESSAGE_EMAIL = "Your email address already exists in our database."
 
 #     return new_user
 
-@router.post("/signup_patient", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.post("/signup_patient", status_code=status.HTTP_201_CREATED, response_model=schemas.JSONUserOut)
 def signup_patient(user: schemas.PatientCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
@@ -48,10 +48,12 @@ def signup_patient(user: schemas.PatientCreate, db: Session = Depends(get_db)):
     new_patient = models.Patient(patient_id = new_user.id, **user.dict(exclude={'email', 'password'}))
     db.add(new_patient)
     db.commit()
+    db.refresh(new_patient)
+    
+    return schemas.JSONUserOut(status="success", id=new_patient.id, data=new_user)
 
-    return new_user
 
-@router.post("/signup_doctor", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.post("/signup_doctor", status_code=status.HTTP_201_CREATED, response_model=schemas.JSONUserOut)
 def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if db_user:
@@ -74,10 +76,12 @@ def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
     new_doctor = models.Doctor(doctor_id = new_user.id, **user.dict(exclude={'email', 'password'}))
     db.add(new_doctor)
     db.commit()
+    db.refresh(new_doctor)
+    
+    return schemas.JSONUserOut(status="success", id=new_doctor.id, data=new_user)
 
-    return new_user
 
-@router.get('/{id}', response_model=schemas.UserData)
+@router.get('/{id}', response_model=schemas.JSONUserData)
 def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         error_response = {
@@ -112,10 +116,8 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
         }
         return JSONResponse(content=error_response, status_code=404)
 
-    return {
-            "user": user,
-            "details": details
-        }
+    response_obj = { "user": user, "details": details }
+    return schemas.JSONUserData(status="success", id=current_user.id, data=response_obj)
 
 
 @router.put('/savedata/{id}')
