@@ -149,13 +149,13 @@ class TokenData(BaseModel):
 # Rating and Reviews
 
 class RatingCreate(BaseModel):
-    rating: int
+    rating: float
     review: str
     doctor_id: int
 
 
 class RatingOut(BaseModel):
-    rating: int
+    rating: float
     review: str
 
     class Config:
