@@ -252,7 +252,7 @@ class DoctorConsultationOut(BaseModel):
     doctor_id: int
     consultation_date: datetime
     status: str
-    doctor: PatientOut
+    patient: PatientOut
     diseaseinfo: DiseaseOut
     
     class Config:
