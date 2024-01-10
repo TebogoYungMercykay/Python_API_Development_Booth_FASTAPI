@@ -53,7 +53,7 @@ def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Dep
     
     list_feedback = []
     for single_feedback in reviews:
-        feedback_sender = db.query(models.Patient).filter(models.Patient.id == single_feedback.sender_id).first()
+        feedback_sender = db.query(models.Patient).filter(models.Patient.patient_id == single_feedback.sender_id).first()
         if not feedback_sender:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Feedback Sender with id {single_feedback.sender_id} not found")
