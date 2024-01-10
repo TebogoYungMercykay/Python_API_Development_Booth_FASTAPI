@@ -68,7 +68,7 @@ def map_disease_to_doctor(disease):
             'Alcoholic hepatitis', 'Jaundice', 'hepatitis A', 'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Diabetes ', 'Hypoglycemia'
         ]
 
-    consultdoctor = "other"
+    consultdoctor = "Medical Practitioner"
     
     if disease in rheumatologist:
         consultdoctor = "Rheumatologist"
