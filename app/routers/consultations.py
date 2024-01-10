@@ -14,7 +14,7 @@ router = APIRouter(
     tags=['Consultations']
 )
 
-@router.get('/all_consultations/{id}', response_model=schemas.ConsultationResponse)
+@router.get('/all_consultations/{id}', response_model=schemas.JSONConsultationResponse)
 def consult_a_doctor(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         error_response = {
@@ -33,10 +33,11 @@ def consult_a_doctor(id: int, db: Session = Depends(get_db), current_user: int =
         }
         return JSONResponse(content=error_response, status_code=404)
 
-    return schemas.ConsultationResponse(count=len(consultations), Consultations=consultations)
+    response_obj = schemas.ConsultationResponse(count=len(consultations), Consultations=consultations)
+    return schemas.JSONConsultationResponse(status="success", id=current_user.id, data=response_obj)
 
 
-@router.post('/make_consultation', response_model=schemas.PatientConsultationOut)
+@router.post('/make_consultation', response_model=schemas.JSONPatientConsultationOut)
 def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == details.doctor_id).first()
     if not doctor:
@@ -61,10 +62,11 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
     db.add(consultation)
     db.commit()
     
-    return schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=datetime, status=details.status, doctor=doctor, diseaseinfo=diseaseinfo)
+    response_obj = schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=datetime, status=details.status, doctor=doctor, diseaseinfo=diseaseinfo)
+    return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=response_obj)
 
 
-@router.get('/consultation_view_patient/{id}', response_model=schemas.PatientConsultationOut)
+@router.get('/consultation_view_patient/{id}', response_model=schemas.JSONPatientConsultationOut)
 def consultation_view_patient(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):    
     consultation = db.query(models.Consultation).filter(and_(models.Consultation.patient_id == current_user.id, models.Consultation.id == id)).first()
 
@@ -95,11 +97,10 @@ def consultation_view_patient(id: int, db: Session = Depends(get_db), current_us
         return JSONResponse(content=error_response, status_code=404)
     
     consultation_details = schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
+    return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=consultation_details)
 
-    return consultation_details
 
-
-@router.get('/consultation_view_doctor/{id}', response_model=schemas.DoctorConsultationOut)
+@router.get('/consultation_view_doctor/{id}', response_model=schemas.JSONDoctorConsultationOut)
 def consultation_view_doctor(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):    
     consultation = db.query(models.Consultation).filter(and_(models.Consultation.doctor_id == current_user.id, models.Consultation.id == id)).first()
     
@@ -130,11 +131,10 @@ def consultation_view_doctor(id: int, db: Session = Depends(get_db), current_use
         return JSONResponse(content=error_response, status_code=404)
     
     consultation_details = schemas.DoctorConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
+    return schemas.JSONDoctorConsultationOut(status="success", id=current_user.id, data=consultation_details)
 
-    return consultation_details
 
-
-@router.get('/consultation_history_patient', response_model=schemas.PatientConsultationResponse)
+@router.get('/consultation_history_patient', response_model=schemas.JSONPatientConsultationResponse)
 def consultation_history_patient(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):    
     consultations = db.query(models.Consultation).filter(models.Consultation.patient_id == current_user.id).all()
     if not consultations:
@@ -168,10 +168,11 @@ def consultation_history_patient(db: Session = Depends(get_db), current_user: in
         consultation_details = schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
-    return schemas.PatientConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
+    response_obj = schemas.PatientConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
+    return schemas.JSONPatientConsultationResponse(status="success", id=current_user.id, data=response_obj)
 
 
-@router.get('/consultation_history_doctor', response_model=schemas.DoctorConsultationResponse)
+@router.get('/consultation_history_doctor', response_model=schemas.JSONDoctorConsultationResponse)
 def consultation_history_doctor(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):    
     consultations = db.query(models.Consultation).filter(models.Consultation.doctor_id == current_user.id).all()
     if not consultations:
@@ -205,10 +206,11 @@ def consultation_history_doctor(db: Session = Depends(get_db), current_user: int
         consultation_details = schemas.DoctorConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
-    return schemas.DoctorConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
+    response_obj = schemas.DoctorConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
+    return schemas.JSONDoctorConsultationResponse(status="success", id=current_user.id, data=response_obj)
 
 
-@router.post('/close_consultation/{id}', response_model=schemas.ConsultationOut)
+@router.post('/close_consultation/{id}', response_model=schemas.JSONConsultationOut)
 def close_consultation(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     consultation_query = db.query(models.Consultation).filter(models.Consultation.id == id)
     consultation = consultation_query.first()
@@ -231,10 +233,10 @@ def close_consultation(id: int, db: Session = Depends(get_db), current_user: int
     consultation_query.update({"status": "closed"}, synchronize_session=False)
     db.commit()
     
-    return  consultation_query.first()
+    return schemas.JSONConsultationOut(status="success", id=current_user.id, data=consultation_query.first())
 
 
-@router.post('/create_review/{id}', response_model=schemas.RatingOut)
+@router.post('/create_review/{id}', response_model=schemas.JSONRatingOut)
 def create_review(id: int, review_details: schemas.RatingCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if id == current_user.id:
         error_response = {
@@ -265,10 +267,10 @@ def create_review(id: int, review_details: schemas.RatingCreate, db: Session = D
     db.add(review)
     db.commit()
     
-    return review_details.dict()
+    return schemas.JSONRatingOut(status="success", id=current_user.id, data=review_details.dict())
 
 
-@router.get('/get_reviews', response_model=List[schemas.RatingResponse])
+@router.get('/get_reviews', response_model=schemas.JSONListRatingResponse)
 def get_reviews(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     reviews = db.query(models.RatingReview).all()
     
@@ -288,10 +290,10 @@ def get_reviews(db: Session = Depends(get_db), current_user: int = Depends(oauth
         rating_response = schemas.RatingResponse(doctor_id=doctor_id, average_rating=average_rating, Ratings=reviews)
         result.append(rating_response)
 
-    return result
+    return schemas.JSONRatingResponse(status="success", id=current_user.id, data=result)
 
 
-@router.get('/get_reviews/{id}', response_model=schemas.RatingResponse)
+@router.get('/get_reviews/{id}', response_model=schemas.JSONRatingResponse)
 def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     reviews = db.query(models.RatingReview).filter(models.RatingReview.doctor_id == id).all()
     
@@ -306,5 +308,5 @@ def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depen
     average_rating = utils.calculate_average_rating(reviews)
     result = schemas.RatingResponse(doctor_id=id, average_rating=average_rating, Ratings=reviews)
     
-    return result
+    return schemas.JSONRatingResponse(status="success", id=current_user.id, data=result)
 
