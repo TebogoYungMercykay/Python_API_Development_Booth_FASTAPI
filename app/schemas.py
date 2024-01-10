@@ -295,7 +295,7 @@ class FeedbackCreate(BaseModel):
     feedback: str
 
 
-class FeedbackOut(BaseModel):
+class FeedbackOutput(BaseModel):
     id: int
     created_at: datetime
     feedback: str
