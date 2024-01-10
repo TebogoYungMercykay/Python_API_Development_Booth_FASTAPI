@@ -157,5 +157,6 @@ class Feedback(Base):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     created_at = Column(DateTime, nullable=False, server_default=text('now()'))
     sender_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    receiver_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="CASCADE"))
     feedback = Column(Text, nullable=False)
 
