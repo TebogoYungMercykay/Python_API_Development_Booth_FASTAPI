@@ -15,12 +15,28 @@ router = APIRouter(
 
 @router.get('/')
 def consult_a_doctor():
+    
     return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
-@router.post('/make_consultation')
-def make_consultation():
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
+@router.post('/make_consultation', response_model=schemas.ConsultationOut)
+def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    doctor = db.query(models.Doctor).filter(models.Doctor.name == details.doctor_id).first()
+    if not doctor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Doctor with id: {id} not found.")
+        
+    diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == details.diseaseinfo_id).first()
+    if not diseaseinfo:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Disease with id: {id} not found.")
+        
+    datetime = utils.get_current_time()
+    consultation = models.Consultation(patient_id=current_user.id, consultation_date=datetime, **details.dict())
+    db.add(consultation)
+    db.commit()
+    
+    return schemas.ConsultationOut(patient_id=current_user.id, consultation_date=datetime, status=details.status, doctor=doctor, diseaseinfo=diseaseinfo)
 
 
 @router.get('/consultation_history')
