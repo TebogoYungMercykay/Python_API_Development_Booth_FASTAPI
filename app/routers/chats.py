@@ -15,7 +15,7 @@ router = APIRouter(
     tags=['Chats & Feedback']
 )
 
-@router.post('/chat_messages/{id}', response_model=schemas.ChatList)
+@router.post('/chat_messages/{id}', response_model=schemas.JSONChatList)
 def chat_messages(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     chats = db.query(models.Chat).filter(models.Chat.consultation_id == id).all()
     if not chats:
@@ -26,10 +26,11 @@ def chat_messages(id: int, db: Session = Depends(get_db), current_user: int = De
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    return schemas.ChatList(consultation_id=id, chats=chats)
+    response_obj = schemas.ChatList(consultation_id=id, chats=chats)
+    return schemas.JSONChatList(status="success", id=current_user.id, data=response_obj)
 
 
-@router.post('/create_chat/{id}', response_model=schemas.ChatOut)
+@router.post('/create_chat/{id}', response_model=schemas.JSONChatOut)
 def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     consultation = db.query(models.Consultation).filter(models.Consultation.id == id).first()
     if not consultation:
@@ -45,10 +46,10 @@ def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db)
     db.commit()
     db.refresh(new_message)
     
-    return new_message
+    return schemas.JSONChatOut(status="success", id=current_user.id, data=new_message)
 
 
-@router.post('/user_feedback/{id}', response_model=schemas.FeedbackResponse)
+@router.post('/user_feedback/{id}', response_model=schemas.JSONFeedbackResponse)
 def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
     if not doctor:
@@ -80,11 +81,12 @@ def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Dep
             return JSONResponse(content=error_response, status_code=404)
         
         list_feedback.append(schemas.FeedbackOut(created_at=single_feedback.created_at, feedback=single_feedback.feedback, sender=feedback_sender))
-        
-    return schemas.FeedbackResponse(doctor_id=id, FeedBacks=list_feedback)
+    
+    response_obj = schemas.FeedbackResponse(doctor_id=id, FeedBacks=list_feedback)
+    return schemas.JSONFeedbackResponse(status="success", id=current_user.id, data=response_obj)
 
 
-@router.post('/post_feedback/{id}', response_model=schemas.FeedbackOutput)
+@router.post('/post_feedback/{id}', response_model=schemas.JSONFeedbackOutput)
 def post_feedback(id: int, message: schemas.FeedbackCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
     if not doctor:
@@ -101,7 +103,7 @@ def post_feedback(id: int, message: schemas.FeedbackCreate, db: Session = Depend
     db.commit()
     db.refresh(new_feedback)
     
-    return new_feedback
+    return schemas.JSONFeedbackOutput(status="success", id=current_user.id, data=new_feedback)
 
 
 @router.post('/whatsapp')
