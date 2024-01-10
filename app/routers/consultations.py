@@ -56,9 +56,8 @@ def create_review(id: int, review_details: schemas.RatingCreate, db: Session = D
     review = models.RatingReview(patient_id=current_user.id, **review_details.dict())
     db.add(review)
     db.commit()
-    db.refresh(review)
     
-    return review
+    return review_details.dict()
 
 
 @router.get('/get_reviews', response_model=List[schemas.RatingResponse])
@@ -79,7 +78,7 @@ def get_reviews(db: Session = Depends(get_db), current_user: int = Depends(oauth
     return result
 
 
-@router.get('/get_reviews/{id}', response_model=List[schemas.RatingResponse])
+@router.get('/get_reviews/{id}', response_model=schemas.RatingResponse)
 def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     reviews = db.query(models.RatingReview).filter(models.RatingReview.doctor_id == id).all()
     
