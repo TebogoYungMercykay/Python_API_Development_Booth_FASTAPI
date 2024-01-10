@@ -145,7 +145,7 @@ class Chat(Base):
     __tablename__ = "chats"
 
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    created = Column(DateTime, nullable=False, server_default=text('now()'))
+    created_at = Column(DateTime, nullable=False, server_default=text('now()'))
     consultation_id = Column(Integer, ForeignKey("consultations.id", ondelete="CASCADE"))
     sender_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     message = Column(Text, nullable=False)
@@ -155,7 +155,8 @@ class Feedback(Base):
     __tablename__ = "feedbacks"
 
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    created = Column(DateTime, nullable=False, server_default=text('now()'))
+    created_at = Column(DateTime, nullable=False, server_default=text('now()'))
     sender_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    receiver_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="CASCADE"))
     feedback = Column(Text, nullable=False)
 
