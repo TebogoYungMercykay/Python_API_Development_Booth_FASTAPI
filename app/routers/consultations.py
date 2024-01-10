@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from sqlalchemy import func
-from .. import models, schemas, oauth2
+from .. import models, schemas, oauth2, utils
 from ..database import get_db
 
 MESSAGE_UNDER_CONSTRUCTION = "Functionality Under Construction."
@@ -38,7 +38,46 @@ def close_consultation():
     return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
 
 
-@router.post('/rate_review')
-def rate_review():
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
+@router.post('/rate_review/{id}', response_model=schemas.RatingOut)
+def rate_review(id: int, review_details: schemas.RatingCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    if id == current_user.id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="You cannot rate/review yourself.")
+    
+    doctor = db.query(models.User).filter(models.User.id == id).first()
+    if not doctor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Doctor with id: {id} not found.")
+    
+    if doctor.id != review_details.doctor_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Doctor id does not Match the One in Request.")
+        
+    review = models.RatingReview(patient_id=current_user.id, **review_details.dict())
+    db.add(review)
+    db.commit()
+    db.refresh(review)
+    
+    return review
+
+
+@router.get('/get_reviews', response_model=List[schemas.RatingResponse])
+def get_reviews(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    reviews = db.query(models.Rating).all()
+    
+    return reviews
+
+
+@router.get('/get_review/{id}', response_model=List[schemas.RatingResponse])
+def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    reviews = db.query(models.Rating).filter(models.Rating.doctor_id == id).all()
+    
+    if not reviews:
+        raise HTTPException(status_code=404, detail="Doctor with id: {id} not found")
+    
+    average_rating = utils.get_average_rating(reviews)
+    
+    result = schemas.RatingResponse(doctor_id=id, average_rating=average_rating, Ratings=reviews)
+    
+    return result
 
