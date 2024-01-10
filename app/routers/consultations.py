@@ -63,20 +63,30 @@ def rate_review(id: int, review_details: schemas.RatingCreate, db: Session = Dep
 
 @router.get('/get_reviews', response_model=List[schemas.RatingResponse])
 def get_reviews(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    reviews = db.query(models.Rating).all()
+    reviews = db.query(models.RatingReview).all()
     
-    return reviews
+    if not reviews:
+        raise HTTPException(status_code=404, detail="There are Currently no Reviews")
+
+    reviews_by_doctor = utils.group_reviews_by_doctor(reviews)
+    result = []
+
+    for doctor_id, reviews in reviews_by_doctor.items():
+        average_rating = utils.calculate_average_rating(reviews)
+        rating_response = schemas.RatingResponse(doctor_id=doctor_id, average_rating=average_rating, Ratings=reviews)
+        result.append(rating_response)
+
+    return result
 
 
 @router.get('/get_review/{id}', response_model=List[schemas.RatingResponse])
 def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    reviews = db.query(models.Rating).filter(models.Rating.doctor_id == id).all()
+    reviews = db.query(models.RatingReview).filter(models.RatingReview.doctor_id == id).all()
     
     if not reviews:
         raise HTTPException(status_code=404, detail="Doctor with id: {id} not found")
     
     average_rating = utils.get_average_rating(reviews)
-    
     result = schemas.RatingResponse(doctor_id=id, average_rating=average_rating, Ratings=reviews)
     
     return result
