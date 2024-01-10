@@ -11,22 +11,72 @@ MESSAGE_UNDER_CONSTRUCTION = "Functionality Under Construction."
 
 router = APIRouter(
     prefix="/chats",
-    tags=['Chats']
+    tags=['Chats & Feedback']
 )
 
-@router.get('/')
-def chat_messages():
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
+@router.post('/chat_messages/{id}', response_model=schemas.ChatList)
+def chat_messages(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    chats = db.query(models.Chat).filter(models.Chat.id == id).all()
+    if not chats:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Chat with id {id} not found")
+    
+    return schemas.ChatList(consultation_id=id, chats=chats)
 
 
-@router.get('/get_feedback')
-def get_feedback():
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
+@router.post('/create_chat/{id}', response_model=schemas.ChatOut)
+def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    consultation = db.query(models.Consultation).filter(models.Consultation.id == id).first()
+    if not consultation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Consultation with id {id} not found")
+        
+    new_message = models.Chat(sender_id=current_user.id, consultation_id=id, **message.dict())
+    db.add(new_message)
+    db.commit()
+    db.refresh(new_message)
+    
+    return new_message
 
 
-@router.post('/post_feedback')
-def post_feedback():
-    return { "status":"pending", "message": MESSAGE_UNDER_CONSTRUCTION }
+@router.post('/user_feedback/{id}', response_model=schemas.FeedbackResponse)
+def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    doctor = db.query(models.Doctor).filter(models.Doctor.id == id).first()
+    if not doctor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"There is Currently no Feedback from Doctors for user, id: {id}")
+        
+    reviews = db.query(models.Feedback).filter(models.Feedback.doctor_id == id).all()
+    if not reviews:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"There is Currently no Feedback from Doctors for user, id: {id}")
+    
+    list_feedback = []
+    for single_feedback in reviews:
+        feedback_sender = db.query(models.Patient).filter(models.Patient.id == single_feedback.sender_id).first()
+        if not feedback_sender:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Feedback Sender with id {single_feedback.sender_id} not found")
+        
+        list_feedback.append(schemas.FeedbackOut(created_at=single_feedback.created_at, feedback=single_feedback.feedback, sender=feedback_sender))
+        
+    return schemas.FeedbackResponse(doctor_id=id, FeedBacks=list_feedback)
+
+
+@router.post('/post_feedback/{id}', response_model=schemas.FeedbackOutput)
+def post_feedback(id: int, message: schemas.FeedbackCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    doctor = db.query(models.Doctor).filter(models.Doctor.id == id).first()
+    if not doctor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Doctor with id {id} not found")
+    
+    new_feedback = models.Feedback(sender_id=current_user.id, **message.dict())
+
+    db.add(new_feedback)
+    db.commit()
+    db.refresh(new_feedback)
+    
+    return new_feedback
 
 
 @router.post('/whatsapp')
