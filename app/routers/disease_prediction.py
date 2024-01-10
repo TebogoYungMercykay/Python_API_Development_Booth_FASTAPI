@@ -27,12 +27,7 @@ def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depe
         
     diseases = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.patient_id == current_user.id).all()
     
-    all_diseases = []
-    for disease in diseases:
-        disease_out = schemas.DiseaseOut(**disease.dict())
-        all_diseases.append(disease_out)
-    
-    return all_diseases
+    return diseases
 
 @router.get('/checkdisease/{id}/{disease_id}', response_model=schemas.DiseaseOut)
 def checkdisease(id: int, disease_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
@@ -87,5 +82,4 @@ def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = D
     db.refresh(store_disease)
     
     return store_disease
-
 
