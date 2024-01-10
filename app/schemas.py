@@ -267,17 +267,27 @@ class DoctorConsultationResponse(BaseModel):
         from_attributes = True 
 
 
-class Chats(BaseModel):
-    consultation_id: int
-    created_at: datetime
-    message: str
-    
+# CHATS: The Chatting System
+        
 
-class ChatsOut(BaseModel):
+class Chats(BaseModel):
+    message: str
+
+
+class ChatOut(BaseModel):
     consultation_id: int
     created_at: datetime
     message: str
     sender_id: int
+    class Config:
+        from_attributes = True
+  
+
+class ChatList(BaseModel):
+    consultation_id: int
+    chats: list[ChatOut]
+    class Config:
+        from_attributes = True
 
 
 class FeedbackCreate(BaseModel):
@@ -285,12 +295,31 @@ class FeedbackCreate(BaseModel):
     feedback: str
 
 
+class FeedbackOut(BaseModel):
+    id: int
+    created_at: datetime
+    feedback: str
+    
+    class Config:
+        from_attributes = True
+
+
+class Sender(BaseModel):
+    name: str
+    surname: str
+    
+    class Config:
+        from_attributes = True
+
 class FeedbackOut(FeedbackCreate):
-    sender_id: int
+    sender: Sender
+    
+    class Config:
+        from_attributes = True
 
 
 class FeedbackResponse(BaseModel):
-    user_id: int
+    doctor_id: int
     FeedBacks: List[FeedbackOut]
 
     
