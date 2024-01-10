@@ -79,7 +79,7 @@ def get_reviews(db: Session = Depends(get_db), current_user: int = Depends(oauth
     return result
 
 
-@router.get('/get_review/{id}', response_model=List[schemas.RatingResponse])
+@router.get('/get_reviews/{id}', response_model=List[schemas.RatingResponse])
 def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     reviews = db.query(models.RatingReview).filter(models.RatingReview.doctor_id == id).all()
     
