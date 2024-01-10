@@ -13,7 +13,7 @@ router = APIRouter(
     tags=['Consultations']
 )
 
-@router.get('/{id}', response_model=schemas.ConsultationResponse)
+@router.get('/all_consultations/{id}', response_model=schemas.ConsultationResponse)
 def consult_a_doctor(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -29,18 +29,18 @@ def consult_a_doctor(id: int, db: Session = Depends(get_db), current_user: int =
 
 @router.post('/make_consultation', response_model=schemas.PatientConsultationOut)
 def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    doctor = db.query(models.Doctor).filter(models.Doctor.name == details.doctor_id).first()
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == details.doctor_id).first()
     if not doctor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Doctor with id: {id} not found.")
+                            detail="Doctor with id: {details.doctor_id} not found.")
         
     diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == details.diseaseinfo_id).first()
     if not diseaseinfo:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Disease with id: {id} not found.")
+                            detail="Disease with id: {details.diseaseinfo_id} not found.")
         
     datetime = utils.get_current_time()
-    consultation = models.Consultation(patient_id=current_user.id, consultation_date=datetime, **details.dict())
+    consultation = models.Consultation(patient_id=current_user.id, **details.dict())
     db.add(consultation)
     db.commit()
     
@@ -53,17 +53,17 @@ def consultation_view_patient(id: int, db: Session = Depends(get_db), current_us
 
     if not consultation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Consultations for Patient with id: {id} not found.")
+                            detail="Consultations for Patient with id: {current_user.id} not found.")
         
     doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == consultation.doctor_id).first()
     if not doctor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Doctor with id: {id} not found.")
+                            detail="Doctor with id: {consultation.doctor_id} not found.")
     
     diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == consultation.diseaseinfo_id).first()
     if not diseaseinfo:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Disease with id: {id} not found.")
+                            detail="Disease with id: {consultation.diseaseinfo_id} not found.")
     
     consultation_details = schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
 
@@ -76,18 +76,18 @@ def consultation_view_doctor(id: int, db: Session = Depends(get_db), current_use
     
     if not consultation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Consultations for Doctor with id: {id} not found.")
+                            detail="Consultations for Doctor with id: {current_user.id} not found.")
         
-    patient = db.query(models.Patient).filter(models.Patient.patient_id == consultation.doctor_id).first()
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == consultation.patient_id).first()
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Patient with id: {id} not found.")
+                            detail="Patient with id: {consultation.patient_id} not found.")
     diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == consultation.diseaseinfo_id).first()
     if not diseaseinfo:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Disease with id: {id} not found.")
+                            detail="Disease with id: {consultation.diseaseinfo_id} not found.")
     
-    consultation_details = schemas.PatientConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
+    consultation_details = schemas.DoctorConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
 
     return consultation_details
 
@@ -97,19 +97,19 @@ def consultation_history_patient(db: Session = Depends(get_db), current_user: in
     consultations = db.query(models.Consultation).filter(models.Consultation.patient_id == current_user.id).all()
     if not consultations:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Consultations for Patient with id: {id} not found.")
+                            detail="Consultations for Patient with id: {current_user.id} not found.")
         
     list_consultations = []
     for consultation in consultations:
         doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == consultation.doctor_id).first()
         if not doctor:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="Doctor with id: {id} not found.")
+                                detail="Doctor with id: {consultation.doctor_id} not found.")
     
         diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == consultation.diseaseinfo_id).first()
         if not diseaseinfo:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="Disease with id: {id} not found.")
+                                detail="Disease with id: {consultation.diseaseinfo_id} not found.")
         
         consultation_details = schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
@@ -122,21 +122,21 @@ def consultation_history_doctor(db: Session = Depends(get_db), current_user: int
     consultations = db.query(models.Consultation).filter(models.Consultation.doctor_id == current_user.id).all()
     if not consultations:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Consultations for Doctor with id: {id} not found.")
+                            detail="Consultations for Doctor with id: {current_user.id} not found.")
         
     list_consultations = []
     for consultation in consultations:
-        patient = db.query(models.Patient).filter(models.Patient.patient_id == consultation.doctor_id).first()
+        patient = db.query(models.Patient).filter(models.Patient.patient_id == consultation.patient_id).first()
         if not patient:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="Patient with id: {id} not found.")
+                                detail="Patient with id: {consultation.patient_id} not found.")
     
         diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == consultation.diseaseinfo_id).first()
         if not diseaseinfo:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="Disease with id: {id} not found.")
+                                detail="Disease with id: {consultation.diseaseinfo_id} not found.")
     
-        consultation_details = schemas.PatientConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
+        consultation_details = schemas.DoctorConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
     return schemas.DoctorConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
