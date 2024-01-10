@@ -270,7 +270,7 @@ class DoctorConsultationResponse(BaseModel):
 # CHATS: The Chatting System
         
 
-class Chats(BaseModel):
+class Chat(BaseModel):
     message: str
 
 
