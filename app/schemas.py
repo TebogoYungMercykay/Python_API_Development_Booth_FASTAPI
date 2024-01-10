@@ -83,6 +83,12 @@ class Post(PostBase):
         from_attributes = True
 
 
+class JSONPost(JSONResult):
+    data: Post
+    
+    class Config:
+        from_attributes = True
+
 class Replies(BaseModel):
     post_id: int
     content: str
@@ -132,6 +138,13 @@ class JSONPostOut(JSONResult):
         from_attributes = True
 
 
+class JSONListPostOut(JSONResult):
+    data: List[PostOut]
+    
+    class Config:
+        from_attributes = True
+
+
 class AllPostOut(BaseModel):
     Post: Post
     votes: int
@@ -142,7 +155,7 @@ class AllPostOut(BaseModel):
 
 
 class JSONAllPostOut(JSONResult):
-    data: AllPostOut
+    data: List[AllPostOut]
     
     class Config:
         from_attributes = True
@@ -284,6 +297,13 @@ class JSONRatingResponse(JSONResult):
         from_attributes = True
 
 
+class JSONListRatingResponse(JSONResult):
+    data: List[RatingResponse]
+    
+    class Config:
+        from_attributes = True
+        
+
 # DISEASE: Schema
 
 
@@ -303,6 +323,12 @@ class DiseaseOut(BaseModel):
 
 class JSONDiseaseOut(JSONResult):
     data: DiseaseOut
+    
+    class Config:
+        from_attributes = True
+        
+class JSONListDiseaseOut(JSONResult):
+    data: List[DiseaseOut]
     
     class Config:
         from_attributes = True
@@ -341,6 +367,13 @@ class ConsultationResponse(BaseModel):
     class Config:
         from_attributes = True
         
+
+class JSONConsultationResponse(JSONResult):
+    data: ConsultationResponse
+    
+    class Config:
+        from_attributes = True
+
 
 class PatientConsultationOut(BaseModel):
     patient_id: int
@@ -458,7 +491,7 @@ class FeedbackOutput(BaseModel):
         from_attributes = True
 
 
-class JSONFeedbackCreate(JSONResult):
+class JSONFeedbackOutput(JSONResult):
     data: FeedbackOutput
     
     class Config:
