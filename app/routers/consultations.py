@@ -86,7 +86,7 @@ def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depen
     if not reviews:
         raise HTTPException(status_code=404, detail="Doctor with id: {id} not found")
     
-    average_rating = utils.get_average_rating(reviews)
+    average_rating = utils.calculate_average_rating(reviews)
     result = schemas.RatingResponse(doctor_id=id, average_rating=average_rating, Ratings=reviews)
     
     return result
