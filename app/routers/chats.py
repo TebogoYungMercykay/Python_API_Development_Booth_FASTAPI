@@ -52,6 +52,7 @@ def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db)
         return JSONResponse(content=error_response, status_code=404)
     
     new_message = models.Chat(sender_id=current_user.id, consultation_id=id, **message.dict())
+
     db.add(new_message)
     db.commit()
     db.refresh(new_message)
@@ -91,6 +92,7 @@ def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Dep
         return JSONResponse(content=error_response, status_code=404)
         
     reviews = db.query(models.Feedback).filter(models.Feedback.receiver_id == id).all()
+
     if not reviews:
         error_response = {
             "status": "error",
@@ -102,6 +104,7 @@ def get_feedback(id: int, db: Session = Depends(get_db), current_user: int = Dep
     list_feedback = []
     for single_feedback in reviews:
         feedback_sender = db.query(models.Patient).filter(models.Patient.patient_id == single_feedback.sender_id).first()
+
         if not feedback_sender:
             error_response = {
                 "status": "error",
