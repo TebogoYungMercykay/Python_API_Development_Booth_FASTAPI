@@ -7,7 +7,7 @@ from pydantic.types import conint
 # JSON: Returned Result Structure
 
 class JSONResult(BaseModel):
-    status: int
+    status: str
     id: int
     # data: dict
     
@@ -57,6 +57,13 @@ class JSONDoctorOut(JSONResult):
     class Config:
         from_attributes = True
     
+
+class JSONListDoctorOut(JSONResult):
+    data: List[DoctorOut]
+    
+    class Config:
+        from_attributes = True
+
 
 class PatientOut(BaseModel):
     name: str
@@ -210,7 +217,7 @@ class UserUpdate(BaseModel):
     mobile_no: int
 
 
-class DetailsOut(UserOut):
+class DetailsOut(BaseModel):
     name: str
     surname: str
     address: str
