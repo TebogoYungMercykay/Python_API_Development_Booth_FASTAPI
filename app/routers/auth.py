@@ -5,7 +5,10 @@ from fastapi.responses import JSONResponse
 
 from .. import database, schemas, models, utils, oauth2
 
-router = APIRouter(tags=['Authentication'])
+router = APIRouter(
+    prefix="/auth",
+    tags=['Authentication']
+)
 
 MESSAGE_INVALID = "Invalid user Credentials."
 
