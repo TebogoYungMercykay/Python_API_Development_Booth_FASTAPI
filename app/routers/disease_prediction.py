@@ -21,7 +21,7 @@ router = APIRouter(
     tags=['Disease Prediction Model']
 )
 
-@router.get('/{id}', response_model=schemas.JSONListDiseaseOut)
+@router.post('/{id}', response_model=schemas.JSONListDiseaseOut)
 def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         error_response = {
@@ -35,8 +35,9 @@ def get_disease(id: int, db: Session = Depends(get_db), current_user: int = Depe
     
     return schemas.JSONListDiseaseOut(status="success", id=current_user.id, data=diseases)
 
-@router.get('/checkdisease/{id}/{disease_id}', response_model=schemas.JSONDiseaseOut)
-def checkdisease(id: int, disease_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+
+@router.post('/check_disease/{id}/{disease_id}', response_model=schemas.JSONDiseaseOut)
+def check_disease(id: int, disease_id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         error_response = {
             "status": "error",
@@ -58,7 +59,7 @@ def checkdisease(id: int, disease_id: int, db: Session = Depends(get_db), curren
     return schemas.JSONDiseaseOut(status="success", id=current_user.id, data=disease)
 
 
-@router.post('/createdisease/{id}', response_model=schemas.JSONDiseaseOut)
+@router.post('/create_disease/{id}', response_model=schemas.JSONDiseaseOut)
 def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         error_response = {
@@ -101,5 +102,5 @@ def create_disease(id: int, disease_info: schemas.DiseaseCreate, db: Session = D
     db.commit()
     db.refresh(store_disease)
     
-    return schemas.JSONDiseaseOut(status="success", id=current_user.id, data=store_disease)
+    return schemas.JSONDiseaseOut(status="success", id=store_disease.id, data=store_disease)
 

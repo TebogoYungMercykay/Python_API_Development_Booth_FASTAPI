@@ -108,6 +108,7 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
     
     doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
     patient = db.query(models.Patient).filter(models.Patient.patient_id == id).first()
+
     if not doctor and not patient:
         error_response = {
             "status": "error",
@@ -129,6 +130,7 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
         return JSONResponse(content=error_response, status_code=404)
 
     response_obj = schemas.UserData(user=current_user, details=details)
+
     return schemas.JSONUserData(status="success", id=current_user.id, data=response_obj)
 
 
@@ -165,6 +167,6 @@ def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get
         doctor_query.update(update_data, synchronize_session=False)
 
     db.commit()
-
+    
     return { "status": "success", "id": -1, "data": "User Data Successfully Updated." }
 

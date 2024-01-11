@@ -35,6 +35,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
         return JSONResponse(content=error_response, status_code=403)
 
     access_token = oauth2.create_access_token(data={"user_id": user.id})
+
     user_query.update({ "is_active": True, "last_login": utils.get_current_time() })
     db.commit()
 
@@ -53,6 +54,7 @@ def logout(id: int, db: Session = Depends(database.get_db), current_user: int = 
         
     logout_query = db.query(models.User).filter(models.User.id == current_user.id)
     logout = logout_query.first()
+
     if not logout:
         error_response = {
             "status": "error",
