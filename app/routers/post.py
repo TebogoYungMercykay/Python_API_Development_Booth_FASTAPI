@@ -87,7 +87,7 @@ def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends
         }
         return JSONResponse(content=error_response, status_code=404)
 
-    return schemas.JSONPost(status="success", id=current_user.id, data=post)
+    return schemas.JSONPostOut(status="success", id=current_user.id, data=post)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
