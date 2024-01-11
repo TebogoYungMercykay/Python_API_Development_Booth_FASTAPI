@@ -1,5 +1,6 @@
 from passlib.context import CryptContext
 from datetime import datetime
+import random
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -16,6 +17,8 @@ def hash(password: str):
 def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+def random_number():
+    return random.randint(1000, 9999)
 
 def calculate_average_rating(reviews):
     if not reviews:
