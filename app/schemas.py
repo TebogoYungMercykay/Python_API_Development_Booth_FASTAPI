@@ -320,6 +320,7 @@ class DiseaseCreate(BaseModel):
     
 
 class DiseaseOut(BaseModel):
+    id: int
     diseasename: str
     confidence: float
     consultdoctor: str
@@ -473,6 +474,7 @@ class JSONChatOut(JSONResult):
 
 class ChatList(BaseModel):
     consultation_id: int
+    status: str
     chats: list[ChatOut]
     class Config:
         from_attributes = True
