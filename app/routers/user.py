@@ -45,12 +45,12 @@ def signup_patient(user: schemas.PatientCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     # Accessing the ID assigned to new_user
-    new_patient = models.Patient(patient_id = new_user.id, **user.dict(exclude={'email', 'password'}))
+    new_patient = models.Patient(patient_id=new_user.id, **user.dict(exclude={'email', 'password'}))
     db.add(new_patient)
     db.commit()
     db.refresh(new_patient)
     
-    return schemas.JSONUserOut(status="success", id=new_patient.id, data=new_user)
+    return schemas.JSONUserOut(status="success", id=new_patient.patient_id, data=new_user)
 
 
 @router.post("/signup_doctor", status_code=status.HTTP_201_CREATED, response_model=schemas.JSONUserOut)
@@ -73,15 +73,30 @@ def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     # Accessing the ID assigned to new_user
-    new_doctor = models.Doctor(doctor_id = new_user.id, **user.dict(exclude={'email', 'password'}))
+    new_doctor = models.Doctor(doctor_id=new_user.id, **user.dict(exclude={'email', 'password'}))
     db.add(new_doctor)
     db.commit()
     db.refresh(new_doctor)
     
-    return schemas.JSONUserOut(status="success", id=new_doctor.id, data=new_user)
+    return schemas.JSONUserOut(status="success", id=new_doctor.doctor_id, data=new_user)
 
 
-@router.get('/{id}', response_model=schemas.JSONUserData)
+@router.post('/doctors', response_model=schemas.JSONListDoctorOut)
+def get_doctors(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    doctors = db.query(models.Doctor).all()
+    
+    if not doctors:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "No doctors found"
+        }
+        return JSONResponse(content=error_response, status_code=404)
+        
+    return schemas.JSONListDoctorOut(status="success", id=current_user.id, data=doctors)
+
+
+@router.post('/{id}', response_model=schemas.JSONUserData)
 def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if current_user.id != id:
         error_response = {
@@ -90,23 +105,20 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
             "data": MESSAGE_UNAUTHORIZED
         }
         return JSONResponse(content=error_response, status_code=401)
-
-    user = db.query(models.User).filter(models.User.id == id).first()
-    if not user:
+    
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == id).first()
+    if not doctor and not patient:
         error_response = {
             "status": "error",
             "id": -1,
-            "data": f"User with id: {id} does not exist"
+            "data": f"Details for User with id: {id} does not exist"
         }
         return JSONResponse(content=error_response, status_code=404)
-        
-    user_details = db.query(models.User, models.Patient, models.Doctor).\
-        outerjoin(models.Patient, models.Patient.patient_id == models.User.id).\
-        outerjoin(models.Doctor, models.Doctor.doctor_id == models.User.id).\
-        filter(models.User.id == id).first()
-        
-    user, patient, doctor = user_details
-    details = patient or doctor
+    
+    details = doctor
+    if patient:
+        details = patient
         
     if not details:
         error_response = {
@@ -116,7 +128,7 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
         }
         return JSONResponse(content=error_response, status_code=404)
 
-    response_obj = { "user": user, "details": details }
+    response_obj = schemas.UserData(user=current_user, details=details)
     return schemas.JSONUserData(status="success", id=current_user.id, data=response_obj)
 
 
