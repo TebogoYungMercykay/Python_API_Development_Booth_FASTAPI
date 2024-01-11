@@ -14,7 +14,7 @@ router = APIRouter(
     tags=['Posts']
 )
 
-@router.get("/", response_model=schemas.JSONListPostOut)
+@router.post("/", response_model=schemas.JSONListPostOut)
 def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
 
     posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
@@ -31,7 +31,7 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
     
     return schemas.JSONListPostOut(status="success", id=current_user.id, data=posts)
 
-@router.get("/all_posts", response_model=schemas.JSONAllPostOut)
+@router.post("/all_posts", response_model=schemas.JSONAllPostOut)
 def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     posts_query = db.query(models.Post, func.count(models.Vote.post_id).label("votes"))\
         .outerjoin(models.Vote, models.Vote.post_id == models.Post.id)\
@@ -62,8 +62,8 @@ def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
     return schemas.JSONAllPostOut(status="success", id=current_user.id, data=all_posts_out_list)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.JSONPost)
-def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.post("/create_post", status_code=status.HTTP_201_CREATED, response_model=schemas.JSONPost)
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     new_post = models.Post(owner_id=current_user.id, **post.dict())
     db.add(new_post)
@@ -73,7 +73,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
     return schemas.JSONPost(status="success", id=current_user.id, data=new_post)
 
 
-@router.get("/{id}", response_model=schemas.JSONPostOut)
+@router.post("/{id}", response_model=schemas.JSONPostOut)
 def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
