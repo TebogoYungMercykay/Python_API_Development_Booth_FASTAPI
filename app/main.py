@@ -21,12 +21,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
 app.include_router(consultations.router)
 app.include_router(disease_prediction.router)
 app.include_router(chats.router)
+app.include_router(post.router)
 
 
 @app.get("/")
