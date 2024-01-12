@@ -51,7 +51,7 @@ def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db)
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    new_message = models.Chat(sender_id=current_user.id, consultation_id=id, **message.dict())
+    new_message = models.Chat(sender_id=current_user.id, consultation_id=id, **message.model_dump())
 
     db.add(new_message)
     db.commit()
@@ -71,7 +71,7 @@ def post_feedback(id: int, message: schemas.FeedbackCreate, db: Session = Depend
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    new_feedback = models.Feedback(sender_id=current_user.id, receiver_id=id, **message.dict())
+    new_feedback = models.Feedback(sender_id=current_user.id, receiver_id=id, **message.model_dump())
 
     db.add(new_feedback)
     db.commit()
