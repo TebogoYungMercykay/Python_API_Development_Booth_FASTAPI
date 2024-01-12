@@ -13,8 +13,7 @@ router = APIRouter(
 MESSAGE_INVALID = "Invalid user Credentials."
 
 @router.post('/login', response_model=schemas.JSONToken)
-def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
-
+def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db), type: str = 'patient'):
     user_query = db.query(models.User).filter(models.User.email == user_credentials.username)
     user = user_query.first()
 
@@ -34,6 +33,35 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
         }
         return JSONResponse(content=error_response, status_code=403)
 
+    if type == 'admin':
+        if user.is_superuser != True:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": MESSAGE_INVALID
+            }
+            return JSONResponse(content=error_response, status_code=403)
+    elif type == 'doctor':
+        doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == user.id).first()
+        if not doctor:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": MESSAGE_INVALID
+            }
+            return JSONResponse(content=error_response, status_code=403)
+    else:
+        patient = db.query(models.Patient).filter(models.Patient.patient_id == user.id).first()
+        if not patient:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": MESSAGE_INVALID
+            }
+            return JSONResponse(content=error_response, status_code=403)
+    
+    # Generate JWT Token
+        
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 
     user_query.update({ "is_active": True, "last_login": utils.get_current_time() })
@@ -41,6 +69,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
 
     response_obj = { "access_token": access_token, "token_type": "bearer" }
     return schemas.JSONToken(status="success", id=user.id, data=response_obj)
+
 
 @router.post('/logout/{id}')
 def logout(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
