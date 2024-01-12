@@ -58,7 +58,7 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
         return JSONResponse(content=error_response, status_code=404)
         
     datetime = utils.get_current_time()
-    consultation = models.Consultation(patient_id=current_user.id, **details.dict())
+    consultation = models.Consultation(patient_id=current_user.id, **details.model_dump())
     db.add(consultation)
     db.commit()
     
@@ -263,11 +263,11 @@ def create_review(id: int, review_details: schemas.RatingCreate, db: Session = D
         }
         return JSONResponse(content=error_response, status_code=400)
         
-    review = models.RatingReview(patient_id=current_user.id, **review_details.dict())
+    review = models.RatingReview(patient_id=current_user.id, **review_details.model_dump())
     db.add(review)
     db.commit()
     
-    return schemas.JSONRatingOut(status="success", id=current_user.id, data=review_details.dict())
+    return schemas.JSONRatingOut(status="success", id=current_user.id, data=review_details.model_dump())
 
 
 @router.post('/get_reviews', response_model=schemas.JSONListRatingResponse)
