@@ -65,7 +65,7 @@ def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
 @router.post("/create_post", status_code=status.HTTP_201_CREATED, response_model=schemas.JSONPost)
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    new_post = models.Post(owner_id=current_user.id, **post.dict())
+    new_post = models.Post(owner_id=current_user.id, **post.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -145,7 +145,7 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
         }
         return JSONResponse(content=error_response, status_code=401)
 
-    post_query.update(updated_post.dict(), synchronize_session=False)
+    post_query.update(updated_post.model_dump(), synchronize_session=False)
     db.commit()
     
     return schemas.JSONPost(status="success", id=current_user.id, data=post_query.first())
@@ -171,7 +171,7 @@ def create_reply(id: int, reply_post: schemas.Replies, db: Session = Depends(get
         }
         return JSONResponse(content=error_response, status_code=404)
 
-    new_post = models.Reply(user_id=current_user.id, **reply_post.dict())
+    new_post = models.Reply(user_id=current_user.id, **reply_post.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
