@@ -16,7 +16,7 @@ MESSAGE_INVALID = "Invalid user Credentials."
 def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db), type: str = 'patient'):
     user_query = db.query(models.User).filter(models.User.email == user_credentials.username)
     user = user_query.first()
-
+    names = 'Admin User'
     if not user:
         error_response = {
             "status": "error",
@@ -25,6 +25,41 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
         }
         return JSONResponse(content=error_response, status_code=403)
 
+    else:
+        if type == 'admin':
+            if user.is_superuser != True:
+                error_response = {
+                    "status": "error",
+                    "id": -1,
+                    "data": MESSAGE_INVALID
+                }
+                return JSONResponse(content=error_response, status_code=403)
+        elif type == 'doctor':
+            doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == user.id).first()
+            if not doctor:
+                error_response = {
+                    "status": "error",
+                    "id": -1,
+                    "data": MESSAGE_INVALID
+                }
+                return JSONResponse(content=error_response, status_code=403)
+            
+            else:
+                names = 'Dr ' + doctor.surname
+    
+        else:
+            patient = db.query(models.Patient).filter(models.Patient.patient_id == user.id).first()
+            if not patient:
+                error_response = {
+                    "status": "error",
+                    "id": -1,
+                    "data": MESSAGE_INVALID
+                }
+                return JSONResponse(content=error_response, status_code=403)
+
+            else:
+                names = 'Mr ' + patient.surname if patient.gender == 'male' else 'Ms ' + patient.surname
+    
     if not utils.verify(user_credentials.password, user.password):
         error_response = {
             "status": "error",
@@ -32,33 +67,6 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
             "data": MESSAGE_INVALID
         }
         return JSONResponse(content=error_response, status_code=403)
-
-    if type == 'admin':
-        if user.is_superuser != True:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": MESSAGE_INVALID
-            }
-            return JSONResponse(content=error_response, status_code=403)
-    elif type == 'doctor':
-        doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == user.id).first()
-        if not doctor:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": MESSAGE_INVALID
-            }
-            return JSONResponse(content=error_response, status_code=403)
-    else:
-        patient = db.query(models.Patient).filter(models.Patient.patient_id == user.id).first()
-        if not patient:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": MESSAGE_INVALID
-            }
-            return JSONResponse(content=error_response, status_code=403)
     
     # Generate JWT Token
         
@@ -68,7 +76,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
     db.commit()
 
     response_obj = { "access_token": access_token, "token_type": "bearer" }
-    return schemas.JSONToken(status="success", id=user.id, data=response_obj)
+    return schemas.JSONToken(status="success", id=user.id, name=names, data=response_obj)
 
 
 @router.post('/logout/{id}')

@@ -255,6 +255,7 @@ class Token(BaseModel):
 
 
 class JSONToken(JSONResult):
+    name: str
     data: Token
     
     class Config:
