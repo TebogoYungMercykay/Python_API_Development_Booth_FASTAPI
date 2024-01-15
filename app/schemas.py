@@ -257,6 +257,7 @@ class Token(BaseModel):
 
 
 class JSONToken(JSONResult):
+    name: str
     data: Token
     
     class Config:
@@ -325,6 +326,7 @@ class DiseaseOut(BaseModel):
     id: int
     diseasename: str
     confidence: float
+    symptoms: List[str]
     consultdoctor: str
     
     class Config:
@@ -389,6 +391,7 @@ class PatientConsultationOut(BaseModel):
     patient_id: int
     consultation_date: datetime
     status: str
+    patient: PatientOut
     doctor: DoctorOut
     diseaseinfo: DiseaseOut
     
@@ -423,6 +426,7 @@ class DoctorConsultationOut(BaseModel):
     consultation_date: datetime
     status: str
     patient: PatientOut
+    doctor: DoctorOut
     diseaseinfo: DiseaseOut
     
     class Config:
