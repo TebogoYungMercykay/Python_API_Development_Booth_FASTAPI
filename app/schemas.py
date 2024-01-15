@@ -47,6 +47,7 @@ class DoctorOut(BaseModel):
     name: str
     surname: str
     specialization: str
+    doctor_id: int
     class Config:
         from_attributes = True
 
@@ -69,6 +70,7 @@ class PatientOut(BaseModel):
     name: str
     surname: str
     dob: datetime
+    patient_id: int
     class Config:
         from_attributes = True
 
