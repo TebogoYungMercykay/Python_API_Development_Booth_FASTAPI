@@ -170,3 +170,36 @@ def savedata(id: int, update_user: schemas.UserUpdate, db: Session = Depends(get
     
     return { "status": "success", "id": -1, "data": "User Data Successfully Updated." }
 
+
+@router.post('/patient_profile/{id}', response_model=schemas.JSONPatientProfile)
+def patient_profile(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == id).first()
+
+    if not patient:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Details for Patient Profile with id: {id} does not exist"
+        }
+        
+        return JSONResponse(content=error_response, status_code=404)
+
+    return schemas.JSONPatientProfile(status="success", id=patient.patient_id, data=patient)
+
+
+@router.post('/doctor_profile/{id}', response_model=schemas.JSONDoctorProfile)
+def doctor_profile(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == id).first()
+
+    if not doctor:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Details for Doctor Profile with id: {id} does not exist"
+        }
+        
+        return JSONResponse(content=error_response, status_code=404)
+        
+    return schemas.JSONDoctorProfile(status="success", id=doctor.doctor_id, data=doctor)
