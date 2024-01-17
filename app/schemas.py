@@ -242,6 +242,43 @@ class UserData(BaseModel):
         from_attributes = True
 
 
+class PatientProfile(BaseModel):
+    name: str
+    surname: str
+    dob: datetime
+    address: str 
+    mobile_no: int
+    gender: str
+    
+    class Config:
+        from_attributes = True
+
+
+class DoctorProfile(PatientProfile):
+    qualification: str
+    registration_no: str
+    year_of_registration: datetime
+    state_medical_council: str
+    specialization: str
+
+    class Config:
+        from_attributes = True
+
+
+class JSONPatientProfile(JSONResult):
+    data: PatientProfile
+    
+    class Config:
+        from_attributes = True
+        
+
+class JSONDoctorProfile(JSONResult):
+    data: DoctorProfile
+    
+    class Config:
+        from_attributes = True
+
+
 class JSONUserData(JSONResult):
     data: UserData
     
