@@ -76,9 +76,11 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
 @router.post("/{id}", response_model=schemas.JSONPostOut)
 def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+    post, votes = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
         models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
-
+    
+    replies = db.query(models.Reply).filter(models.Reply.post_id == id).all()
+    
     if not post:
         error_response = {
             "status": "error",
@@ -87,7 +89,8 @@ def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends
         }
         return JSONResponse(content=error_response, status_code=404)
 
-    return schemas.JSONPostOut(status="success", id=current_user.id, data=post)
+    return schemas.JSONPostOut(status="success", id=current_user.id,
+                               data=schemas.PostOut(Post=post, votes=votes, replies=replies))
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
