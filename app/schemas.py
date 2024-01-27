@@ -225,6 +225,8 @@ class DetailsOut(BaseModel):
     surname: str
     address: str
     mobile_no: int
+    dob: datetime
+    gender: str
 
     class Config:
         from_attributes = True
