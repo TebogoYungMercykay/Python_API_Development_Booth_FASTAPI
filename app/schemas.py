@@ -135,6 +135,7 @@ class JSONRepliesData(JSONResult):
 class PostOut(BaseModel):
     Post: Post
     votes: int
+    replies: List[RepliesOut]
 
     class Config:
         from_attributes = True
