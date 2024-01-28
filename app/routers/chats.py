@@ -33,7 +33,7 @@ def chat_messages(id: int, db: Session = Depends(get_db), current_user: int = De
 
 
 @router.post('/create_chat/{id}', response_model=schemas.JSONChatOut)
-def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), sender_id: int = None):
     consultation = db.query(models.Consultation).filter(models.Consultation.id == id).first()
     if not consultation:
         error_response = {
@@ -43,6 +43,9 @@ def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db)
         }
         return JSONResponse(content=error_response, status_code=404)
     
+    if sender_id is not None:
+        sender_id = current_user.id
+    
     if consultation.status == "closed":
         error_response = {
             "status": "error",
@@ -51,7 +54,7 @@ def create_message(id: int, message: schemas.Chat, db: Session = Depends(get_db)
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    new_message = models.Chat(sender_id=current_user.id, consultation_id=id, **message.model_dump())
+    new_message = models.Chat(sender_id=sender_id, consultation_id=id, **message.model_dump())
 
     db.add(new_message)
     db.commit()
