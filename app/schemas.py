@@ -434,6 +434,14 @@ class JSONConsultationResponse(JSONResult):
     class Config:
         from_attributes = True
 
+class ConsultationHistory(BaseModel):
+    consultation_id: int
+    consultation_date: datetime
+    status: str
+    diseaseinfo: DiseaseOut
+    
+    class Config:
+        from_attributes = True
 
 class PatientConsultationOut(BaseModel):
     consultation_id: int
@@ -456,7 +464,7 @@ class JSONPatientConsultationOut(JSONResult):
 
 class PatientConsultationResponse(BaseModel):
     count: int
-    Consultations: List[PatientConsultationOut]
+    Consultations: List[ConsultationHistory]
     
     class Config:
         from_attributes = True    
@@ -490,7 +498,7 @@ class JSONDoctorConsultationOut(JSONResult):
         
 class DoctorConsultationResponse(BaseModel):
     count: int
-    Consultations: List[DoctorConsultationOut]
+    Consultations: List[ConsultationHistory]
     
     class Config:
         from_attributes = True 
