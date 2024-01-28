@@ -47,7 +47,16 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
             "data": f"Doctor with id: {details.doctor_id} not found."
         }
         return JSONResponse(content=error_response, status_code=404)
-        
+    
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == current_user.id).first()
+    if not patient:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Patient with id: {consultation.patient_id} not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
     diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == details.diseaseinfo_id).first()
     if not diseaseinfo:
         error_response = {
@@ -62,7 +71,7 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
     db.commit()
     db.refresh(consultation)
     
-    response_obj = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
+    response_obj = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
     return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=response_obj)
 
 
