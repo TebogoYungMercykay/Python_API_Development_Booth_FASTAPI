@@ -130,11 +130,16 @@ class JSONRepliesData(JSONResult):
     
     class Config:
         from_attributes = True
-        
+
 
 class PostOut(BaseModel):
     Post: Post
     votes: int
+
+    class Config:
+        from_attributes = True      
+
+class PostOutTwo(PostOut):
     replies: List[RepliesOut]
 
     class Config:
@@ -142,7 +147,7 @@ class PostOut(BaseModel):
 
 
 class JSONPostOut(JSONResult):
-    data: PostOut
+    data: PostOutTwo
     
     class Config:
         from_attributes = True
