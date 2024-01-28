@@ -44,10 +44,18 @@ class JSONUserOut(JSONResult):
     
 
 class DoctorOut(BaseModel):
+    doctor_id: int
     name: str
     surname: str
+    address: str
+    gender: str
+    qualification: str
+    registration_no: str
+    year_of_registration: datetime
+    state_medical_council: str
     specialization: str
-    doctor_id: int
+    rating: int
+    
     class Config:
         from_attributes = True
 
@@ -130,16 +138,11 @@ class JSONRepliesData(JSONResult):
     
     class Config:
         from_attributes = True
-
+        
 
 class PostOut(BaseModel):
     Post: Post
     votes: int
-
-    class Config:
-        from_attributes = True      
-
-class PostOutTwo(PostOut):
     replies: List[RepliesOut]
 
     class Config:
@@ -147,7 +150,7 @@ class PostOutTwo(PostOut):
 
 
 class JSONPostOut(JSONResult):
-    data: PostOutTwo
+    data: PostOut
     
     class Config:
         from_attributes = True
