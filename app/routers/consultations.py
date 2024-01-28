@@ -183,7 +183,7 @@ def consultation_history_patient(db: Session = Depends(get_db), current_user: in
             }
             return JSONResponse(content=error_response, status_code=404)
         
-        consultation_details = schemas.PatientConsultationOut(patient_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
+        consultation_details = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
     response_obj = schemas.PatientConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
@@ -221,7 +221,7 @@ def consultation_history_doctor(db: Session = Depends(get_db), current_user: int
             }
             return JSONResponse(content=error_response, status_code=404)
     
-        consultation_details = schemas.DoctorConsultationOut(doctor_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
+        consultation_details = schemas.DoctorConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
     response_obj = schemas.DoctorConsultationResponse(count=len(list_consultations), Consultations=list_consultations)

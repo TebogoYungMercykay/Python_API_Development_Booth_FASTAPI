@@ -428,7 +428,7 @@ class JSONConsultationResponse(JSONResult):
 
 
 class PatientConsultationOut(BaseModel):
-    patient_id: int
+    consultation_id: int
     consultation_date: datetime
     status: str
     patient: PatientOut
@@ -462,7 +462,7 @@ class JSONPatientConsultationResponse(JSONResult):
         
 
 class DoctorConsultationOut(BaseModel):
-    doctor_id: int
+    consultation_id: int
     consultation_date: datetime
     status: str
     patient: PatientOut
