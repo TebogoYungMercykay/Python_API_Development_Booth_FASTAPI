@@ -230,6 +230,8 @@ class DetailsOut(BaseModel):
     surname: str
     address: str
     mobile_no: int
+    dob: datetime
+    gender: str
 
     class Config:
         from_attributes = True
@@ -431,7 +433,7 @@ class JSONConsultationResponse(JSONResult):
 
 
 class PatientConsultationOut(BaseModel):
-    patient_id: int
+    consultation_id: int
     consultation_date: datetime
     status: str
     patient: PatientOut
@@ -465,7 +467,7 @@ class JSONPatientConsultationResponse(JSONResult):
         
 
 class DoctorConsultationOut(BaseModel):
-    doctor_id: int
+    consultation_id: int
     consultation_date: datetime
     status: str
     patient: PatientOut
