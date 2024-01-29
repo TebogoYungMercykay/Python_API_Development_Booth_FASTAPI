@@ -1,4 +1,4 @@
-name: Notificatiion When There Is A Pull Request or Pull On Master
+name: Notificatiion and Deploying API to Heroku
 
 on:
   pull_request:
@@ -21,8 +21,22 @@ jobs:
             body: 'A new pull request or push has been made.',
           });
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [notification-job]
+    environment:
+      name: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-# name: Build and Deploy Code to Docker and Heroku
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+
 
 # on:
 #   push:
