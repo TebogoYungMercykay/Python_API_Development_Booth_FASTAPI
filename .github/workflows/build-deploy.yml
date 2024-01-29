@@ -1,4 +1,4 @@
-name: Notificatiion and Deploying API to Heroku
+name: Notification and Deploying API to Heroku
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Notification
-      uses: actions/github-script@v3
+      uses: actions/github-script@v4
       with:
         github-token: ${{secrets.FASTAPI_URL}}
         script: |
