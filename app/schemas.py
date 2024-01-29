@@ -79,6 +79,9 @@ class PatientOut(BaseModel):
     surname: str
     dob: datetime
     patient_id: int
+    address: str
+    gender: str
+    mobile_no: int
     class Config:
         from_attributes = True
 
