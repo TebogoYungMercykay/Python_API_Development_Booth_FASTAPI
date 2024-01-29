@@ -53,7 +53,7 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
         error_response = {
             "status": "error",
             "id": -1,
-            "data": f"Patient with id: {consultation.patient_id} not found."
+            "data": f"Patient with id: {current_user.id} not found."
         }
         return JSONResponse(content=error_response, status_code=404)
 
@@ -70,6 +70,11 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
     db.add(consultation)
     db.commit()
     db.refresh(consultation)
+    
+    message = schemas.Chat(message=f"Welcome to our consultation chat. I'm Dr. {doctor.surname} {doctor.name} and I'm here to assist you. It's great to connect with you! When you have some questions, concerns, or if there's anything you'd like to discuss, feel free to let me know. Your health is my priority.")
+    new_message = models.Chat(sender_id=details.doctor_id, consultation_id=consultation.id, **message.model_dump())
+    db.add(new_message)
+    db.commit()
     
     response_obj = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
     return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=response_obj)
