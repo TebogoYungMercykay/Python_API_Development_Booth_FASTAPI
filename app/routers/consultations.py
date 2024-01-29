@@ -47,7 +47,16 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
             "data": f"Doctor with id: {details.doctor_id} not found."
         }
         return JSONResponse(content=error_response, status_code=404)
-        
+    
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == current_user.id).first()
+    if not patient:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Patient with id: {consultation.patient_id} not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
     diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == details.diseaseinfo_id).first()
     if not diseaseinfo:
         error_response = {
@@ -56,13 +65,13 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
             "data": f"Disease with id: {details.diseaseinfo_id} not found."
         }
         return JSONResponse(content=error_response, status_code=404)
-        
-    datetime = utils.get_current_time()
+
     consultation = models.Consultation(patient_id=current_user.id, **details.model_dump())
     db.add(consultation)
     db.commit()
+    db.refresh(consultation)
     
-    response_obj = schemas.PatientConsultationOut(consultation_id=current_user.id, consultation_date=datetime, status=details.status, doctor=doctor, diseaseinfo=diseaseinfo)
+    response_obj = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
     return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=response_obj)
 
 
@@ -105,7 +114,7 @@ def consultation_view_patient(id: int, db: Session = Depends(get_db), current_us
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    consultation_details = schemas.PatientConsultationOut(consultation_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
+    consultation_details = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
     return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=consultation_details)
 
 
@@ -148,7 +157,7 @@ def consultation_view_doctor(id: int, db: Session = Depends(get_db), current_use
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    consultation_details = schemas.DoctorConsultationOut(consultation_id=current_user.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
+    consultation_details = schemas.DoctorConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
     return schemas.JSONDoctorConsultationOut(status="success", id=current_user.id, data=consultation_details)
 
 
@@ -165,15 +174,6 @@ def consultation_history_patient(db: Session = Depends(get_db), current_user: in
         
     list_consultations = []
     for consultation in consultations:
-        doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == consultation.doctor_id).first()
-        if not doctor:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": f"Doctor with id: {consultation.doctor_id} not found."
-            }
-            return JSONResponse(content=error_response, status_code=404)
-    
         diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == consultation.diseaseinfo_id).first()
         if not diseaseinfo:
             error_response = {
@@ -183,7 +183,7 @@ def consultation_history_patient(db: Session = Depends(get_db), current_user: in
             }
             return JSONResponse(content=error_response, status_code=404)
         
-        consultation_details = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, doctor=doctor, diseaseinfo=diseaseinfo)
+        consultation_details = schemas.ConsultationHistory(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
     response_obj = schemas.PatientConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
@@ -203,15 +203,6 @@ def consultation_history_doctor(db: Session = Depends(get_db), current_user: int
         
     list_consultations = []
     for consultation in consultations:
-        patient = db.query(models.Patient).filter(models.Patient.patient_id == consultation.patient_id).first()
-        if not patient:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": f"Patient with id: {consultation.patient_id} not found."
-            }
-            return JSONResponse(content=error_response, status_code=404)
-    
         diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == consultation.diseaseinfo_id).first()
         if not diseaseinfo:
             error_response = {
@@ -221,7 +212,7 @@ def consultation_history_doctor(db: Session = Depends(get_db), current_user: int
             }
             return JSONResponse(content=error_response, status_code=404)
     
-        consultation_details = schemas.DoctorConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, diseaseinfo=diseaseinfo)
+        consultation_details = schemas.ConsultationHistory(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, diseaseinfo=diseaseinfo)
         list_consultations.append(consultation_details)
 
     response_obj = schemas.DoctorConsultationResponse(count=len(list_consultations), Consultations=list_consultations)
