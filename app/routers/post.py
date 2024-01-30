@@ -32,11 +32,12 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
     return schemas.JSONListPostOut(status="success", id=current_user.id, data=posts)
 
 @router.post("/all_posts", response_model=schemas.JSONAllPostOut)
-def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+def all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), limit: int = 8, skip: int = 0, search: Optional[str] = ""):
     posts_query = db.query(models.Post, func.count(models.Vote.post_id).label("votes"))\
         .outerjoin(models.Vote, models.Vote.post_id == models.Post.id)\
         .filter(models.Post.title.contains(search))\
-        .group_by(models.Post.id).limit(limit).offset(skip)
+        .group_by(models.Post.id).order_by(models.Post.created_at.desc())\
+        .limit(limit).offset(skip)
 
     posts_and_votes = posts_query.all()
     
