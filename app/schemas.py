@@ -613,4 +613,24 @@ class JSONFeedbackResponse(JSONResult):
     
     class Config:
         from_attributes = True
-        
+
+class AdminDiseaseIndo(BaseModel):
+    id: int
+    patient_id: Optional[int]
+    diseasename: str
+    no_of_symp: int
+    symptoms: list[str]
+    confidence: float
+    consultdoctor: str
+    consultation_date: Optional[datetime]
+    status: Optional[str]
+    
+    class Config:
+        from_attributes = True
+
+
+class JSONAdminDiseaseIndo(JSONResult):
+    data: list[AdminDiseaseIndo]
+
+    class Config:
+        from_attributes = True
