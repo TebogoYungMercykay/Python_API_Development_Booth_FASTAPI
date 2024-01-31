@@ -11,7 +11,7 @@ router = APIRouter(
 
 MESSAGE_INVALID = "Some Error Occured. Please try again."
 
-@router.post("/", response_model=schemas.JSONAdminDiseaseIndo)
+@router.post("/", response_model=schemas.JSONAdminDiseaseInfo)
 def get_info(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     if not current_user:
         error_response = {
@@ -29,8 +29,19 @@ def get_info(db: Session = Depends(get_db), current_user: int = Depends(oauth2.g
         }
         return JSONResponse(content=error_response, status_code=401)
 
-    result = db.query(models.DiseaseInfo, models.Consultation.consultation_date, models.Consultation.status)\
-        .join(models.Consultation, models.DiseaseInfo.id == models.Consultation.diseaseinfo_id, isouter=True).all()
+    result = (
+        db.query(
+            models.DiseaseInfo.id,
+            models.DiseaseInfo.patient_id,
+            models.DiseaseInfo.diseasename,
+            models.DiseaseInfo.no_of_symp,
+            models.DiseaseInfo.symptoms,
+            models.DiseaseInfo.confidence,
+            models.DiseaseInfo.consultdoctor,
+            models.Consultation.consultation_date,
+            models.Consultation.status
+        ).outerjoin(models.Consultation, models.DiseaseInfo.id == models.Consultation.diseaseinfo_id).all()
+    )
 
     if not result:
         error_response = {
@@ -39,5 +50,6 @@ def get_info(db: Session = Depends(get_db), current_user: int = Depends(oauth2.g
             "data": MESSAGE_INVALID
         }
         return JSONResponse(content=error_response, status_code=404)
-    
-    return schemas.JSONAdminDiseaseIndo(status="success", id=current_user.id, data=result)
+
+    return schemas.JSONAdminDiseaseInfo(status="success", id=current_user.id, data=result)
+
