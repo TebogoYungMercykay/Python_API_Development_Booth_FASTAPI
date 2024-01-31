@@ -614,7 +614,7 @@ class JSONFeedbackResponse(JSONResult):
     class Config:
         from_attributes = True
 
-class AdminDiseaseIndo(BaseModel):
+class AdminDiseaseInfo(BaseModel):
     id: int
     patient_id: Optional[int]
     diseasename: str
@@ -629,8 +629,8 @@ class AdminDiseaseIndo(BaseModel):
         from_attributes = True
 
 
-class JSONAdminDiseaseIndo(JSONResult):
-    data: list[AdminDiseaseIndo]
+class JSONAdminDiseaseInfo(JSONResult):
+    data: list[AdminDiseaseInfo]
 
     class Config:
         from_attributes = True
