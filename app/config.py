@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class Settings(BaseSettings):
     database_hostname: str
@@ -15,3 +17,8 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 settings = Settings()
+
+# print(f"Database Hostname: {settings.database_hostname}")
+# print(f"Database Port: {settings.database_port}")
+# print(f"Database Hostname: {settings.database_password}")
+# print(f"Database Port: {settings.database_username}")
