@@ -184,7 +184,7 @@ class JSONAllPostOut(JSONResult):
 
 class Vote(BaseModel):
     post_id: int
-    dir: conint(le=1)
+    dir: int
 
 
 class JSONVote(JSONResult):
