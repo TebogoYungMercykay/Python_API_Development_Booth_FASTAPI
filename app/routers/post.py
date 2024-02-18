@@ -74,6 +74,57 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
     return schemas.JSONPost(status="success", id=current_user.id, data=new_post)
 
 
+@router.post("/vote", status_code=status.HTTP_201_CREATED)
+def vote(vote: schemas.Vote, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+
+    if vote.dir > 1:
+        vote.dir = 1
+    elif vote.dir < 0:
+        vote.dir = 0
+    
+    post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
+    if not post:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Post with id: {vote.post_id} does not exist"
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
+    vote_query = db.query(models.Vote).filter(
+        models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user.id)
+
+    found_vote = vote_query.first()
+    if (vote.dir == 1):
+        if found_vote:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": f"user {current_user.id} has alredy voted on post {vote.post_id}"
+            }
+            return JSONResponse(content=error_response, status_code=409)
+        
+        new_vote = models.Vote(post_id=vote.post_id, user_id=current_user.id)
+        db.add(new_vote)
+        db.commit()
+        
+        return {"status": "success", "id": current_user.id, "data": "successfully added vote"}
+    
+    else:
+        if not found_vote:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": "Vote does not exist"
+            }
+            return JSONResponse(content=error_response, status_code=404)
+
+        vote_query.delete(synchronize_session=False)
+        db.commit()
+
+        return {"status": "success", "id": current_user.id, "data": "successfully deleted vote"}
+
+
 @router.post("/{id}", response_model=schemas.JSONPostOut)
 def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
@@ -183,49 +234,3 @@ def create_reply(id: int, reply_post: schemas.Replies, db: Session = Depends(get
     response_obj = {"reply": new_post, "doctor": doctor }
     return schemas.JSONRepliesData(status="success", id=current_user.id, data=response_obj)
 
-
-@router.post("/vote", status_code=status.HTTP_201_CREATED)
-def vote(vote: schemas.Vote, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-
-    post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
-    if not post:
-        error_response = {
-            "status": "error",
-            "id": -1,
-            "data": f"Post with id: {vote.post_id} does not exist"
-        }
-        return JSONResponse(content=error_response, status_code=404)
-
-    vote_query = db.query(models.Vote).filter(
-        models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user.id)
-
-    found_vote = vote_query.first()
-    if (vote.dir == 1):
-        if found_vote:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": f"user {current_user.id} has alredy voted on post {vote.post_id}"
-            }
-            return JSONResponse(content=error_response, status_code=409)
-        
-        new_vote = models.Vote(post_id=vote.post_id, user_id=current_user.id)
-        db.add(new_vote)
-        db.commit()
-        
-        return {"status": "success", "id": current_user.id, "data": "successfully added vote"}
-    
-    else:
-        if not found_vote:
-            error_response = {
-                "status": "error",
-                "id": -1,
-                "data": "Vote does not exist"
-            }
-            return JSONResponse(content=error_response, status_code=404)
-
-        vote_query.delete(synchronize_session=False)
-        db.commit()
-
-        return {"status": "success", "id": current_user.id, "data": "successfully deleted vote"}
-    
