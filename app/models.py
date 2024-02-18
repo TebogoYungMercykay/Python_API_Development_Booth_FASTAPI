@@ -118,6 +118,7 @@ class Consultation(Base):
     diseaseinfo_id = Column(Integer, ForeignKey("diseaseinfos.id", ondelete="SET NULL"), nullable=True)
     consultation_date = Column(DateTime, nullable=False)
     status = Column(String(20), nullable=False)
+    channel = Column(String(100),nullable=True)
 
 
 class RatingReview(Base):

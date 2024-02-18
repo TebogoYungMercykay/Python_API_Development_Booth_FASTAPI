@@ -79,6 +79,35 @@ def make_consultation(details: schemas.ConsultationCreate, db: Session = Depends
     response_obj = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
     return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=response_obj)
 
+@router.put('/update_consultation/{id}', response_model=schemas.JSONConsultationOut)
+def update_consultation(id: int, updated_details: schemas.ConsultationUpdate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    consultation = db.query(models.Consultation).filter(models.Consultation.id == id).first()
+
+    if not consultation:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Consultation with id: {id} not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+    
+    # Check if the user is authorized to update the consultation
+    if consultation.doctor_id != current_user.id and consultation.patient_id != current_user.id:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "You are not authorized to update this consultation."
+        }
+        return JSONResponse(content=error_response, status_code=401)
+    
+    # Update consultation details
+    for key, value in updated_details.model_dump().items():
+        setattr(consultation, key, value)
+    
+    db.commit()
+    db.refresh(consultation)
+    
+    return schemas.JSONConsultationOut(status="success", id=current_user.id, data=consultation)
 
 @router.post('/consultation_view_patient/{id}', response_model=schemas.JSONPatientConsultationOut)
 def consultation_view_patient(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):    
@@ -119,7 +148,7 @@ def consultation_view_patient(id: int, db: Session = Depends(get_db), current_us
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    consultation_details = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
+    consultation_details = schemas.PatientConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo,channel=consultation.channel)
     return schemas.JSONPatientConsultationOut(status="success", id=current_user.id, data=consultation_details)
 
 
@@ -162,7 +191,7 @@ def consultation_view_doctor(id: int, db: Session = Depends(get_db), current_use
         }
         return JSONResponse(content=error_response, status_code=404)
     
-    consultation_details = schemas.DoctorConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo)
+    consultation_details = schemas.DoctorConsultationOut(consultation_id=consultation.id, consultation_date=consultation.consultation_date, status=consultation.status, patient=patient, doctor=doctor, diseaseinfo=diseaseinfo,channel=consultation.channel)
     return schemas.JSONDoctorConsultationOut(status="success", id=current_user.id, data=consultation_details)
 
 

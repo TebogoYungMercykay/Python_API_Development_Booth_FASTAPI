@@ -406,11 +406,15 @@ class ConsultationCreate(BaseModel):
     consultation_date: datetime
     status: str
 
+class ConsultationUpdate(BaseModel):
+    channel: str
+
 
 class ConsultationOut(BaseModel):
     id: int
     consultation_date: datetime
     status: str
+    channel:Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -450,6 +454,7 @@ class PatientConsultationOut(BaseModel):
     consultation_id: int
     consultation_date: datetime
     status: str
+    channel: Optional[str] = None
     patient: PatientOut
     doctor: DoctorOut
     diseaseinfo: DiseaseOut
@@ -484,6 +489,7 @@ class DoctorConsultationOut(BaseModel):
     consultation_id: int
     consultation_date: datetime
     status: str
+    channel: Optional[str] = None
     patient: PatientOut
     doctor: DoctorOut
     diseaseinfo: DiseaseOut

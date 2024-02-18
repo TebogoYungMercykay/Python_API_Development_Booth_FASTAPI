@@ -97,6 +97,7 @@ def upgrade():
     sa.Column('diseaseinfo_id', sa.Integer(), nullable=True),
     sa.Column('consultation_date', sa.DateTime(), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('channel', sa.String(length=100), nullable=True),
     sa.ForeignKeyConstraint(['diseaseinfo_id'], ['diseaseinfos.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctors.doctor_id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ondelete='SET NULL'),
