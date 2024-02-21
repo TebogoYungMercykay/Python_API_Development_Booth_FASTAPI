@@ -162,3 +162,14 @@ class Feedback(Base):
     receiver_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="CASCADE"))
     feedback = Column(Text, nullable=False)
 
+
+class RatingPrediction(Base):
+    __tablename__ = "ratingprediction"
+
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    diseaseinfo_id = Column(Integer, ForeignKey("diseaseinfos.id", ondelete="SET NULL"), nullable=True)
+    consultation_id = Column(Integer, ForeignKey("consultations.id", ondelete="SET NULL"), nullable=True)
+    doctor_id = Column(Integer, ForeignKey("doctors.doctor_id", ondelete="SET NULL"), nullable=True)
+    rating = Column(Integer, server_default='0')
+    symptoms = Column(ARRAY(String), nullable=False)
+    diseasename = Column(String(200), nullable=False)
