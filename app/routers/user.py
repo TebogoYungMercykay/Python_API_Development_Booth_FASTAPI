@@ -45,7 +45,7 @@ def signup_patient(user: schemas.PatientCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     # Accessing the ID assigned to new_user
-    new_patient = models.Patient(patient_id=new_user.id, **user.dict(exclude={'email', 'password'}))
+    new_patient = models.Patient(patient_id=new_user.id, **user.model_dump(exclude={'email', 'password'}))
     db.add(new_patient)
     db.commit()
     db.refresh(new_patient)
@@ -73,7 +73,7 @@ def signup_doctor(user: schemas.DoctorCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     
     # Accessing the ID assigned to new_user
-    new_doctor = models.Doctor(doctor_id=new_user.id, **user.dict(exclude={'email', 'password'}))
+    new_doctor = models.Doctor(doctor_id=new_user.id, **user.model_dump(exclude={'email', 'password'}))
     db.add(new_doctor)
     db.commit()
     db.refresh(new_doctor)

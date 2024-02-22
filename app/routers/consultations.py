@@ -324,3 +324,87 @@ def get_review(id: int, db: Session = Depends(get_db), current_user: int = Depen
     
     return schemas.JSONRatingResponse(status="success", id=current_user.id, data=result)
 
+
+@router.post('/rate_prediction', response_model=schemas.JSONRatingPredictionOut)
+def rate_prediction(rating_details: schemas.RatingPredictionCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    if rating_details.doctor_id != current_user.id:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "You are not authorized to perform this action."
+        }
+        return JSONResponse(content=error_response, status_code=400)
+    
+    doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == rating_details.doctor_id).first()
+    if not doctor:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Doctor with id: {rating_details.doctor_id} not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+    
+    diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == rating_details.diseaseinfo_id).first()
+    if not diseaseinfo:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": f"Disease Info with id: {rating_details.diseaseinfo_id} not found."
+        }
+        return JSONResponse(content=error_response, status_code=404)
+        
+    rating = models.RatingPrediction(**rating_details.model_dump())
+    db.add(rating)
+    db.commit()
+
+    final_rating_details = schemas.RatingPredictionOut(diseaseinfo=diseaseinfo, doctor=doctor, rating=rating_details.rating, symptoms=rating_details.symptoms, diseasename=rating_details.diseasename)
+    return schemas.JSONRatingPredictionOut(status="success", id=rating_details.doctor_id, data=final_rating_details)
+
+
+@router.post('/get_rating_prediction', response_model=schemas.JSONListRatingPredictionOut)
+def get_rating_prediction(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    
+    if current_user.is_superuser != True:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "You are not authorized to perform this action."
+        }
+        return JSONResponse(content=error_response, status_code=400)
+    
+    ratings = db.query(models.RatingPrediction).all()
+    
+    if not ratings:
+        error_response = {
+            "status": "error",
+            "id": -1,
+            "data": "There are Currently no Ratings"
+        }
+        return JSONResponse(content=error_response, status_code=404)
+
+    rating_predictions = []
+
+    for details in ratings:
+        
+        doctor = db.query(models.Doctor).filter(models.Doctor.doctor_id == details.doctor_id).first()
+        if not doctor:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": f"Doctor with id: {details.doctor_id} not found."
+            }
+            return JSONResponse(content=error_response, status_code=404)
+        
+        diseaseinfo = db.query(models.DiseaseInfo).filter(models.DiseaseInfo.id == details.diseaseinfo_id).first()
+        if not diseaseinfo:
+            error_response = {
+                "status": "error",
+                "id": -1,
+                "data": f"Disease Info with id: {details.diseaseinfo_id} not found."
+            }
+            return JSONResponse(content=error_response, status_code=404)
+
+        rating_details = schemas.RatingPredictionOut(diseaseinfo=diseaseinfo, doctor=doctor, rating=details.rating, symptoms=details.symptoms, diseasename=details.diseasename)
+        rating_predictions.append(rating_details)
+
+    return schemas.JSONListRatingPredictionOut(status="success", id=current_user.id, data=rating_predictions)
