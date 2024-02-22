@@ -634,3 +634,39 @@ class JSONAdminDiseaseInfo(JSONResult):
 
     class Config:
         from_attributes = True
+        
+        
+# Disease Prediction Information
+
+class RatingPredictionCreate(BaseModel):
+    doctor_id: int
+    diseaseinfo_id: int
+    consultation_id: int
+    rating: int
+    symptoms: List[str]
+    diseasename: str
+
+
+class RatingPredictionOut(BaseModel):
+    diseaseinfo: DiseaseOut
+    doctor: DoctorOut
+    rating: int
+    symptoms: List[str]
+    diseasename: str
+    
+    class Config:
+        from_attributes = True
+        
+
+class JSONRatingPredictionOut(JSONResult):
+    data: RatingPredictionOut
+    
+    class Config:
+        from_attributes = True
+        
+        
+class JSONListRatingPredictionOut(JSONResult):
+    data: List[RatingPredictionOut]
+    
+    class Config:
+        from_attributes = True
